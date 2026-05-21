@@ -1,0 +1,10 @@
+Options -MultiViews
+RewriteEngine On
+
+# Serve existing files and directories directly (images, CSS, JS, PHP, etc.)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Everything else → Vue SPA
+RewriteRule ^ index.html [L]
