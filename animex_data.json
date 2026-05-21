@@ -1,0 +1,1807 @@
+{
+  "anime_id": "16498",
+  "title": "Attack on Titan",
+  "lang_filter": null,
+  "episodes": [
+    {
+      "number": 1,
+      "title": "Episode 1",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/Cw8iW8xWK2sq",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/yIxVOsElH4Jo",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/QBYazPwKefl1",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/Fz2fjbwMWuts",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/Ok9Lgda8a0hN",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/u9RUG6FZmlP6",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/4aa87451811e8db9?sub=https://cdn.cimovix.store/subtitles/cb/95/cb953f6ca5923f7517125db46ed1293d_806a582526a4c5a226514316bd5b6f64.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 2,
+      "title": "Episode 2",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/OdgsxyfuxcXg",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/KSsCIp7CSKFO",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/yZB9HXiuRWk4",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/ilPZlOllArRt",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/DFThXBm4b92D",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/U6Vyta0nT8wu",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/d3edb7801518a8ab?sub=https://cdn.cimovix.store/subtitles/df/eb/dfeb9598fbfb97cc6bbcc0aff2c785d6_993d22958b8469747ea6be7d102fac47.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 3,
+      "title": "Episode 3",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/W8fZ6aS2HOAd",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/VEpadvwEfSK6",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/dHsCYEPQ4omJ",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/ukV7U1no0Pzj",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/TH9SNJySC079",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/yR7Lgc8n4R4L",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/76877abd0b874588?sub=https://cdn.cimovix.store/subtitles/94/4a/944a5ae3483ed5c1e10bbccb7942a279_a68e98f42b160fa77b711d3917dd56a0.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 4,
+      "title": "Episode 4",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/8JFQpMHkX708",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/xgfDPYrq7kSx",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/bPFvGsp9YFKd",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/RnKaVHJjZ5JI",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/yMfJzBAtOKwr",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/BGfvZOJI2lCS",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/48a09bdc2f27099b?sub=https://cdn.cimovix.store/subtitles/1b/31/1b318124e37af6d74a03501474f44ea1_ed35435aeb1632b4e5cf4466a4e8d573.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 5,
+      "title": "Episode 5",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/pS0lYtIjk4hP",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/kpx3RFrG0Uc0",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/1U8N9ci0MdRr",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/v4eoSEp7Hxpo",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/hecy5dBInzd1",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/v1vbp01VHb4d",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/c2040325a4405203?sub=https://cdn.cimovix.store/subtitles/6c/91/6c91724b896cdcf48285039ab05b3aaf_d10fcdc826d5b40997cd5912ad629d32.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 6,
+      "title": "Episode 6",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/DIPvuuyB0DSM",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/tHHPe9rUUTe2",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/I0SFDeayPnCd",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/BqKU1ckXfxZc",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/Ftidq3odLldJ",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/mYQWAFueMjAj",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/b6011912ad803cc7?sub=https://cdn.cimovix.store/subtitles/ba/03/ba036d228858d76fb89189853a5503bd_6601eb20f96adcdcb0c5410f591e9141.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 7,
+      "title": "Episode 7",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/0OOf6fSkaMrC",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/CJj3xhA3J6RI",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/orVZt8B2oLwR",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/6nI2IvrwK4aU",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/GuFiVCW7ZkVs",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/aMe3HMVwCdi6",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/90a6fea4efa80aad?sub=https://cdn.cimovix.store/subtitles/84/85/8485ae387a981d783f8764e508151cd9_075b33fea130e08a85f258e99da68d3a.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 8,
+      "title": "Episode 8",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/CdnElXKDDHAP",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/1APvE48iFiC4",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/hh0ZAJAuYIbr",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/72SGN5fCU0vV",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/fnyMSOpp91fU",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/iE9d0ZIa2qwk",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/41a607507916176d?sub=https://cdn.cimovix.store/subtitles/75/35/7535bbb91c8fde347ad861f293126633_db63b6c50486215b468fdbe26b441bda.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 9,
+      "title": "Episode 9",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/nY4bWwHNKi9E",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/Bm3GtSvTMaOL",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/NnVRCZzx3W55",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/OUgIRjFmoxaB",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/OTxoOLKsfkM3",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/9DDtYLqBpiTh",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/28992477d57a3504?sub=https://cdn.cimovix.store/subtitles/d4/94/d494020ff8ec181ef98ed97ac3f25453_9b29c9dc44da7998e0e6d884d231c702.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 10,
+      "title": "Episode 10",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/nmsn5poEqSCV",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/1dwOHySuVmp4",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/7bWmPkINWMGk",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/FTKDBJFGDScl",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/3smvpBaZsJlL",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/f2OGnDSt7zFO",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/4e49383bb6138e22?sub=https://cdn.cimovix.store/subtitles/3e/a2/3ea2db50e62ceefceaf70a9d9a56a6f4_50b2f644299a2a94b103d57b4485d251.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 11,
+      "title": "Episode 11",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/muBroqr75Od2",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/WZW5TUMfqM8Y",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/kajpL8KBQYGA",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/ii8FHpRyiF67",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/qPwVem1IXoEy",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/dBBmJEalj1aR",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/850774ba3bda6a62?sub=https://cdn.cimovix.store/subtitles/87/f7/87f7ee4fdb57bdfd52179947211b7ebb_72897155096c5dffd6b3aac8f4927e63.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 12,
+      "title": "Episode 12",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/nTGInRSv43X9",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/E0CvJFcKnyUv",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/WQTpbGxhjiYP",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/qEP5HBio7P3B",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/HEYLaa5tpTvm",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/LA08PrdP9QX6",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/691ef7e0f054ee8f?sub=https://cdn.cimovix.store/subtitles/2a/3d/2a3d6d6cc4b5e77238c1fc1bb6cdd681_982c29c73ff30115195469380a2e96e9.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 13,
+      "title": "Episode 13",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/8CsycGXn92t4",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/UXqsShxsJ5yk",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/LiPVfnu28zFP",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/XSzrCJyAi0Cv",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/vPasuIQ4MZsU",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/s471LWj6Sfxn",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/a2dbc4243d6ca861?sub=https://cdn.cimovix.store/subtitles/0e/7c/0e7c7d6c41c76b9ee6445ae01cc0181d_4d48d035f41957dc9d6383338e965d84.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 14,
+      "title": "Episode 14",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/oCZCgVzVSsaK",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/iGvssXdF47Ft",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/DSMXfSkj3Q4J",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/uA76xCXZAnJv",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/88VO4FBi3jQB",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/Tf443zzophXB",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/75bfd76d8b3bfa03?sub=https://cdn.cimovix.store/subtitles/01/41/0141a8aedb1b53970fac7c81dac79fbe_a6d2032716d68ad89a6b71fa66103a61.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 15,
+      "title": "Episode 15",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/m3MGOaQEXfBz",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/YODt1SlREe1h",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/Wz3xOOjVkFAs",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/xQ18SzYZ5gOh",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/oGmo75TgWi1j",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/Fb5r6Z20a6UI",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/33b6ac864eab5012?sub=https://cdn.cimovix.store/subtitles/9a/85/9a85c12a21b76392747906fc7b2aff92_951192cbb3bd9cd7f0215ab1af8281d1.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 16,
+      "title": "Episode 16",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/A8QWSU3sxptH",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/8pmELjCdrv4v",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/2pMmCG2nAb08",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/Jbebt99D8btH",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/nOqy9k8Q9LEj",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/hGHTpeHC1cnW",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/c751748ffbb3d945?sub=https://cdn.cimovix.store/subtitles/0f/fa/0ffaca95e3e5242ba1097ad8a9a6e95d_40f53661ce0979982075e60959cf7060.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 17,
+      "title": "Episode 17",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/sKEp3j22UlI0",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/CaCdJehLwC2d",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/QAVXAElw4twA",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/pplPCioLZJPO",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/jq2ckcwd1N1g",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/iES7boyLFTbi",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/8f88f9ab0b4e66c1?sub=https://cdn.cimovix.store/subtitles/5f/ef/5fef3eff51dc719c4a9f565a742d78f2_7884696a6fbf58560f344e067be768b6.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 18,
+      "title": "Episode 18",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/QKvzoToxZ0hU",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/6eexUMU8zGd8",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/IXUkZMryiHgr",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/W9gXi5NXMqdB",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/p5IN4DYMKT0s",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/WlgUi7jV8klj",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/13d04dcc6e97677b?sub=https://cdn.cimovix.store/subtitles/b5/b0/b5b0db7f3a77ca4fcf9eca57aa7181ca_70c6f6f21ecb82f5c3252672dd936934.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 19,
+      "title": "Episode 19",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/wVWfEenV1EFw",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/gvQdq6DFRvEy",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/JEEhyIvKPzZN",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/QKipT8Mp2jne",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/xMBzjxSMxKe0",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/SUdwEXLMfjn3",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/6c9af27cab35216a?sub=https://cdn.cimovix.store/subtitles/1f/d7/1fd7b875d3473501d1b771ebe934ca59_0c8c2a105aea6460710229373506f6e7.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 20,
+      "title": "Episode 20",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/6KrDw87gbim6",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/4GzBsR50iVqI",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/qPduNFXDHywf",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/xCEshpLeVt1q",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/iULd4PIw9IX9",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/aQrSE2Qx3YGk",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/bc32e4d1a4d6ea1a?sub=https://cdn.cimovix.store/subtitles/98/af/98afdcc1ebd85daa0f1749c5e56b9d8c_de9c26690e52ce11af3f2d964236ee47.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 21,
+      "title": "Episode 21",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/XdXqTH3qRCyM",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/xU7p2IDbuIkp",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/Iu3L5HdLBfQY",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/zZxZqcwGPTjZ",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/USBnagq0q9ZL",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/qoJGpzPaZyNB",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/733b1a25e70a2412?sub=https://cdn.cimovix.store/subtitles/93/93/939314105ce8701e67489642ef4d49e8_8b02fa47dc9570be5f0302260e8e210f.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 22,
+      "title": "Episode 22",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/K62DVxII8tYi",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/cUEyr9J0WfWq",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/2hTEW9zMOH6Q",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/q03H4NsQXFcd",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/N6TgVwnazZtC",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/gzbT2f9ifPKt",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/fd1e511e972b5247?sub=https://cdn.cimovix.store/subtitles/da/9e/da9e6a4a4aeca98588e4dd77ceb37695_1bbbc1cc4403a63f77da2f9c23071120.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 23,
+      "title": "Episode 23",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/n4WcgEjQCqtn",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/CR1Py7kcUdWO",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/okPxxa1WjOHV",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/xZ5HQSCAZs4V",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/GxpsGEHarZnT",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/zGLkZunNJP80",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/47f89693feecf2c3?sub=https://cdn.cimovix.store/subtitles/b8/74/b87470782489389f344c4fa4ceb5260c_d7dc7f989637d40bf8defd4a185f5f0c.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 24,
+      "title": "Episode 24",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/GcEfvNWHKpZP",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/FMf7YXbZIXVo",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/RzuxFERsV1V7",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/GbD22FdoMVF9",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/rU41TLqDVf4Q",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/j8ZHutXzmKlu",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/de31c87a0799657a?sub=https://cdn.cimovix.store/subtitles/9b/db/9bdb8b1faffa4b3d41779bb495d79fb9_baa86d09819db9fd382403e1ba2358b7.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    },
+    {
+      "number": 25,
+      "title": "Episode 25",
+      "sources": [
+        {
+          "url": "https://kwik.cx/e/fsX5zBpXI2hX",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (1080p)",
+          "server": "SUB 1 (1080p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/vD74BE8oKlqq",
+          "quality": "1080p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (1080p)",
+          "server": "DUB 1 (1080p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/YM85mYGduh5N",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (720p)",
+          "server": "SUB 1 (720p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/ywFsSpnquGQi",
+          "quality": "720p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (720p)",
+          "server": "DUB 1 (720p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://kwik.cx/e/uYKciT5cNnR2",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 1 (360p)",
+          "server": "SUB 1 (360p)",
+          "lang": "sub"
+        },
+        {
+          "url": "https://kwik.cx/e/a1XvpP8SIHSs",
+          "quality": "360p",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "DUB 1 (360p)",
+          "server": "DUB 1 (360p)",
+          "lang": "dub"
+        },
+        {
+          "url": "https://vibeplayer.site/06735d405907dd79?sub=https://cdn.cimovix.store/subtitles/e5/2a/e52ad5c9f751f599492b4f087ed7ecfc_8ef28f823762aec5ec4b9f3f6b3a92d6.vtt",
+          "quality": "SUB",
+          "isM3U8": false,
+          "type": "iframe",
+          "title": "SUB 2",
+          "server": "SUB 2",
+          "lang": "sub"
+        }
+      ],
+      "subtitles": [],
+      "intro": null,
+      "outro": null
+    }
+  ]
+}
