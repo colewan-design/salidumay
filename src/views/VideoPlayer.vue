@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppNavbar from '../components/AppNavbar.vue'
+import CommentSection from '../components/CommentSection.vue'
 import { getAnimeDetail, getEpisodes, getRelated, getStreamingLinks } from '../services/api.js'
 import { getAllSources } from '../services/streamSources.js'
 
@@ -12,6 +13,7 @@ const animeId   = computed(() => route.params.id)
 const currentEp = ref(Number(route.params.ep) || 1)
 
 const anime          = ref(null)
+const synopsisExpanded = ref(false)
 const episodes       = ref([])
 const related        = ref([])
 const streamingLinks = ref([])
@@ -144,7 +146,6 @@ onUnmounted(() => {})
             class="video-el"
             :src="activeSrc"
             allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-            allowfullscreen
             frameborder="0"
             scrolling="no"
           ></iframe>
@@ -236,6 +237,9 @@ onUnmounted(() => {})
             </div>
           </div>
         </div>
+
+        <!-- Comments -->
+        <CommentSection v-if="animeId" :anime-id="animeId" />
       </div>
 
       <!-- ── Sidebar ── -->
@@ -262,7 +266,12 @@ onUnmounted(() => {})
             <div class="s-stat"><span class="s-stat-icon star">★</span><div><span class="s-stat-val">{{ typeof anime.rating === 'number' ? anime.rating.toFixed(1) : anime.rating }}</span><span class="s-stat-label">Rating</span></div></div>
             <div class="s-stat" v-if="anime.studio"><span class="s-stat-icon">🎬</span><div><span class="s-stat-val">{{ anime.studio }}</span><span class="s-stat-label">Studio</span></div></div>
           </div>
-          <p class="sidebar-synopsis">{{ anime.synopsis }}</p>
+          <div class="synopsis-wrap">
+            <p class="sidebar-synopsis" :class="{ expanded: synopsisExpanded }">{{ anime.synopsis }}</p>
+            <button v-if="anime.synopsis?.length > 180" class="synopsis-toggle" @click="synopsisExpanded = !synopsisExpanded">
+              {{ synopsisExpanded ? 'See less ↑' : 'See more ↓' }}
+            </button>
+          </div>
           <div class="series-progress" v-if="anime.episodes && typeof anime.episodes === 'number'">
             <div class="sp-header"><span class="sp-label">Progress</span><span class="sp-val">{{ currentEp }} / {{ anime.episodes }}</span></div>
             <div class="sp-track"><div class="sp-fill" :style="{ width: ((currentEp / anime.episodes) * 100) + '%' }"></div></div>
@@ -454,7 +463,11 @@ kbd { background:var(--surface); border:1px solid var(--border); border-radius:3
 .s-stat div { display:flex; flex-direction:column; }
 .s-stat-val { font-size:.9rem; font-weight:800; color:var(--text); line-height:1.2; }
 .s-stat-label { font-size:.65rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; }
-.sidebar-synopsis { font-size:.85rem; color:var(--text-muted); line-height:1.7; margin-bottom:1.25rem; display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; }
+.synopsis-wrap { margin-bottom:1.25rem; }
+.sidebar-synopsis { font-size:.85rem; color:var(--text-muted); line-height:1.7; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; transition:all .3s; }
+.sidebar-synopsis.expanded { -webkit-line-clamp:unset; overflow:visible; }
+.synopsis-toggle { background:none; border:none; color:var(--cyan); font-size:.78rem; font-weight:700; cursor:pointer; padding:.35rem 0 0; display:block; transition:color .2s; }
+.synopsis-toggle:hover { color:var(--pink); }
 .series-progress { margin-bottom:1.25rem; }
 .sp-header { display:flex; justify-content:space-between; margin-bottom:.4rem; }
 .sp-label { font-size:.72rem; font-weight:700; letter-spacing:.08em; color:var(--text-muted); text-transform:uppercase; }

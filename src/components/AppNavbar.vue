@@ -1,28 +1,48 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
+import { useAuth } from '../store/auth.js'
 
 const route  = useRoute()
 const router = useRouter()
+const { user, isLoggedIn, logout } = useAuth()
 
 const scrolled = ref(false)
 const menuOpen = ref(false)
 const searchOpen = ref(false)
 const searchQuery = ref('')
+const userMenuOpen = ref(false)
+
+async function handleLogout() {
+  userMenuOpen.value = false
+  await logout()
+  router.push('/')
+}
 
 function onScroll() {
   scrolled.value = window.scrollY > 40
 }
 
-onMounted(() => window.addEventListener('scroll', onScroll))
-onUnmounted(() => window.removeEventListener('scroll', onScroll))
+function onDocClick(e) {
+  if (!e.target.closest('.user-menu-wrap')) userMenuOpen.value = false
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', onScroll)
+  document.addEventListener('click', onDocClick)
+})
+onUnmounted(() => {
+  window.removeEventListener('scroll', onScroll)
+  document.removeEventListener('click', onDocClick)
+})
 
 const navLinks = [
-  { label: 'Home',      to: { path: '/', hash: '#hero' } },
-  { label: 'Seasonal',  to: { path: '/', hash: '#seasonal' } },
-  { label: 'Genres',    to: { path: '/', hash: '#genres' } },
-  { label: 'Community', to: { path: '/', hash: '#community' } },
-  { label: 'Top Anime', to: { path: '/', hash: '#top' } },
+  { label: 'Home',      to: '/' },
+  { label: 'Trending',  to: '/trending' },
+  { label: 'Seasonal',  to: '/seasonal' },
+  { label: 'Movies',    to: '/movies' },
+  { label: 'Rankings',  to: '/rankings' },
+  { label: 'Genres',    to: '/genre' },
 ]
 
 const isOnWatch = () => route.path.startsWith('/watch')
@@ -73,6 +93,27 @@ function submitSearch() {
             </svg>
           </button>
         </div>
+        <!-- Auth -->
+        <template v-if="isLoggedIn">
+          <div class="user-menu-wrap">
+            <button class="user-avatar-btn" @click="userMenuOpen = !userMenuOpen" aria-label="User menu">
+              <img v-if="user?.avatar" :src="user.avatar" class="user-avatar" alt="avatar" />
+              <span v-else class="user-avatar-initials">{{ user?.name?.[0]?.toUpperCase() || 'U' }}</span>
+            </button>
+            <Transition name="fade">
+              <div v-if="userMenuOpen" class="user-dropdown">
+                <div class="user-dropdown-name">{{ user?.name }}</div>
+                <div class="user-dropdown-email">{{ user?.email }}</div>
+                <hr class="dropdown-divider" />
+                <button class="dropdown-item" @click="handleLogout">Sign Out</button>
+              </div>
+            </Transition>
+          </div>
+        </template>
+        <template v-else>
+          <RouterLink to="/login" class="btn-signin">Sign In</RouterLink>
+        </template>
+
         <button class="icon-btn hamburger" @click="menuOpen = !menuOpen" aria-label="Menu">
           <span :class="{ open: menuOpen }"></span>
         </button>
@@ -90,6 +131,13 @@ function submitSearch() {
           @click="menuOpen = false"
         >{{ link.label }}</RouterLink>
         <RouterLink to="/watch" :class="['mobile-link', 'mobile-link-watch', { active: isOnWatch() }]" @click="menuOpen = false">Watch</RouterLink>
+        <template v-if="isLoggedIn">
+          <button class="mobile-link mobile-signout" @click="handleLogout; menuOpen = false">Sign Out</button>
+        </template>
+        <template v-else>
+          <RouterLink to="/login" class="mobile-link" @click="menuOpen = false">Sign In</RouterLink>
+          <RouterLink to="/register" class="mobile-link" @click="menuOpen = false">Register</RouterLink>
+        </template>
       </div>
     </Transition>
   </nav>
@@ -255,8 +303,110 @@ function submitSearch() {
 .slide-down-enter-from,
 .slide-down-leave-to { opacity: 0; transform: translateY(-8px); }
 
+/* Auth */
+.btn-signin {
+  padding: 0.35rem 0.9rem;
+  border: 1px solid rgba(0,240,255,0.4);
+  border-radius: 6px;
+  color: #00f0ff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  transition: background 0.2s, color 0.2s;
+}
+.btn-signin:hover {
+  background: rgba(0,240,255,0.1);
+}
+
+.user-menu-wrap { position: relative; }
+.user-avatar-btn {
+  background: none;
+  border: 2px solid rgba(0,240,255,0.35);
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s;
+}
+.user-avatar-btn:hover { border-color: #00f0ff; }
+.user-avatar { width: 100%; height: 100%; object-fit: cover; }
+.user-avatar-initials {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #00f0ff;
+}
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: rgba(10,14,26,0.97);
+  border: 1px solid rgba(0,240,255,0.15);
+  border-radius: 10px;
+  min-width: 190px;
+  padding: 0.75rem 0;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  z-index: 200;
+}
+.user-dropdown-name {
+  padding: 0 1rem 0.1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+}
+.user-dropdown-email {
+  padding: 0 1rem 0.5rem;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dropdown-divider {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  margin: 0 0 0.35rem;
+}
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.7);
+  font-size: 0.88rem;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+.dropdown-item:hover { color: #ff6b6b; background: rgba(255,60,60,0.07); }
+
+.mobile-signout {
+  background: none;
+  border: none;
+  text-align: left;
+  color: #ff6b6b;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.8rem 0;
+  font-size: inherit;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+  width: 100%;
+}
+
+.fade-enter-active, .fade-leave-active { transition: opacity 0.15s, transform 0.15s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(-6px); }
+
 @media (max-width: 768px) {
   .nav-links { display: none; }
   .hamburger { display: flex; }
+  .user-menu-wrap { display: none; }
+  .btn-signin { display: none; }
 }
 </style>

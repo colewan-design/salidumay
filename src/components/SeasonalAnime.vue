@@ -1,6 +1,11 @@
 <script setup>
 import AnimeCard from './AnimeCard.vue'
 defineProps({ items: { type: Array, default: () => [] }, loading: Boolean })
+
+const now    = new Date()
+const year   = now.getFullYear()
+const month  = now.getMonth() + 1
+const season = month <= 3 ? 'Winter' : month <= 6 ? 'Spring' : month <= 9 ? 'Summer' : 'Fall'
 </script>
 
 <template>
@@ -8,9 +13,9 @@ defineProps({ items: { type: Array, default: () => [] }, loading: Boolean })
     <div class="section-header">
       <div class="section-title-wrap">
         <span class="section-tag pink">Season</span>
-        <h2 class="section-title">Spring <span class="accent">2025</span></h2>
+        <h2 class="section-title">{{ season }} <span class="accent">{{ year }}</span></h2>
       </div>
-      <a href="#" class="see-all">View All →</a>
+      <router-link to="/seasonal" class="see-all">View All →</router-link>
     </div>
 
     <div class="grid" v-if="!loading">

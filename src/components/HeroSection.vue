@@ -1,83 +1,150 @@
 <script setup>
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const props = defineProps({
-  hero: { type: Object, default: null },
+  items:   { type: Array,   default: () => [] },
   loading: { type: Boolean, default: true },
 })
 
-const router = useRouter()
+const router   = useRouter()
+const current  = ref(0)
+const visible  = ref(true)
+const expanded = ref(false)
+let timer = null
 
-function watchNow() {
-  if (!props.hero) return
-  router.push({ name: 'watch', params: { id: props.hero.id || 1, ep: 1 } })
+const active = computed(() => props.items[current.value] || null)
+
+function goTo(i) {
+  if (i === current.value) return
+  expanded.value = false
+  fade(() => { current.value = i })
+  resetTimer()
 }
+
+function fade(cb) {
+  visible.value = false
+  setTimeout(() => { cb(); visible.value = true }, 500)
+}
+
+function resetTimer() {
+  clearInterval(timer)
+  if (props.items.length < 2) return
+  timer = setInterval(() => {
+    fade(() => { current.value = (current.value + 1) % props.items.length })
+  }, 7000)
+}
+
+watch(() => props.items, (v) => { if (v.length) resetTimer() }, { immediate: true })
+onUnmounted(() => clearInterval(timer))
+
+function watchNow()  { if (active.value) router.push({ name: 'watch', params: { id: active.value.id, ep: 1 } }) }
+function viewDetails() { if (active.value) router.push({ name: 'watch', params: { id: active.value.id, ep: 1 } }) }
 </script>
 
 <template>
-  <section id="hero" class="hero">
-    <!-- Parallax BG -->
-    <div
-      class="hero-bg"
-      :style="hero ? `background-image: url('${hero.image}')` : ''"
-    ></div>
+  <section class="hero">
 
-    <!-- Scanline overlay -->
-    <div class="scanlines"></div>
-
-    <!-- Gradient overlays -->
-    <div class="hero-gradient"></div>
-
-    <!-- Japanese watermark -->
-    <div class="jp-watermark" aria-hidden="true">進撃の巨人</div>
-
-    <!-- Sakura petals -->
-    <div class="petals" aria-hidden="true">
-      <span v-for="n in 12" :key="n" class="petal" :style="`--i:${n}`"></span>
+    <!-- Background images (one per item, crossfade) -->
+    <div class="hero-bg-wrap">
+      <div
+        v-for="(item, i) in items"
+        :key="item.id"
+        class="hero-bg"
+        :class="{ active: i === current }"
+        :style="`background-image: url('${item.image}')`"
+      ></div>
+      <!-- Overlays -->
+      <div class="overlay-left"></div>
+      <div class="overlay-bottom"></div>
+      <div class="overlay-full"></div>
     </div>
 
-    <div class="hero-content" v-if="hero && !loading">
-      <h1 class="hero-title gradient-text">{{ hero.title }}</h1>
-      <p class="hero-subtitle">{{ hero.subtitle }}</p>
-      <p class="hero-synopsis">{{ hero.synopsis }}</p>
-
-      <div class="hero-stats">
-        <div class="stat">
-          <span class="stat-icon">▶</span>
-          <span>{{ hero.episodes }} Episodes</span>
-        </div>
-        <div class="stat">
-          <span class="stat-icon star">★</span>
-          <span>{{ typeof hero.rating === 'number' ? hero.rating.toFixed(1) : hero.rating }}</span>
-        </div>
-        <div class="stat">
-          <span class="stat-icon">🎬</span>
-          <span>{{ hero.studio }}</span>
-        </div>
-      </div>
-
-      <div class="hero-actions">
-        <button class="btn-watch pulse-glow" @click="watchNow">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-          Watch Now
-        </button>
-        <button class="btn-list">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-          Add to List
-        </button>
-      </div>
-    </div>
-
-    <!-- Skeleton loader -->
-    <div class="hero-content" v-else>
-      <div class="skeleton sk-badge"></div>
+    <!-- Skeleton -->
+    <div v-if="loading" class="hero-content">
+      <div class="skeleton sk-tag"></div>
       <div class="skeleton sk-title"></div>
-      <div class="skeleton sk-sub"></div>
+      <div class="skeleton sk-title2"></div>
       <div class="skeleton sk-synopsis"></div>
+      <div class="skeleton sk-meta"></div>
+      <div class="sk-btns">
+        <div class="skeleton sk-btn"></div>
+        <div class="skeleton sk-btn"></div>
+      </div>
     </div>
 
-    <!-- Bottom fade -->
-    <div class="hero-bottom-fade"></div>
+    <!-- Content -->
+    <Transition name="hero-fade">
+      <div class="hero-content" v-if="!loading && active && visible" :key="active.id">
+
+        <span class="genre-tag">{{ active.genre }}</span>
+
+        <h1 class="hero-title">{{ active.title }}</h1>
+
+        <div class="synopsis-wrap">
+          <p class="hero-synopsis" :class="{ expanded }">{{ active.synopsis }}</p>
+          <button v-if="active.synopsis?.length > 160" class="synopsis-more" @click="expanded = !expanded">
+            {{ expanded ? 'See less ↑' : 'See more ↓' }}
+          </button>
+        </div>
+
+        <!-- Metadata row -->
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">FORMAT</span>
+            <span class="meta-value">TV</span>
+          </div>
+          <div class="meta-divider"></div>
+          <div class="meta-item">
+            <span class="meta-label">RELEASED</span>
+            <span class="meta-value">{{ active.year || '—' }}</span>
+          </div>
+          <div class="meta-divider"></div>
+          <div class="meta-item">
+            <span class="meta-label">EPISODES</span>
+            <span class="meta-value">{{ active.episodes || '—' }}</span>
+          </div>
+          <div class="meta-divider"></div>
+          <div class="meta-item">
+            <span class="meta-label">STATUS</span>
+            <span class="meta-value" :class="active.status === 'Airing' ? 'status-airing' : 'status-done'">
+              {{ active.status === 'Airing' ? 'ONGOING' : 'FINISHED' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="hero-actions">
+          <button class="btn-watch" @click="watchNow">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            WATCH NOW
+          </button>
+          <button class="btn-details" @click="viewDetails">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            DETAILS
+          </button>
+        </div>
+
+      </div>
+    </Transition>
+
+    <!-- Carousel dots -->
+    <div class="carousel-dots" v-if="!loading && items.length > 1">
+      <button
+        v-for="(_, i) in items"
+        :key="i"
+        :class="['dot', { active: i === current }]"
+        @click="goTo(i)"
+        :aria-label="`Slide ${i + 1}`"
+      ></button>
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="scroll-hint" aria-hidden="true">
+      <span class="scroll-text">SCROLL</span>
+      <div class="scroll-line"></div>
+    </div>
+
   </section>
 </template>
 
@@ -85,190 +152,222 @@ function watchNow() {
 .hero {
   position: relative;
   height: 100vh;
-  min-height: 620px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  min-height: 640px;
   overflow: hidden;
+  display: flex;
+  align-items: flex-end;
 }
+
+/* ── Background ── */
+.hero-bg-wrap { position: absolute; inset: 0; }
 
 .hero-bg {
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   background-size: cover;
-  background-position: center top;
-  background-color: #060b1a;
-  transform: scale(1.06);
-  animation: parallax-drift 20s ease-in-out infinite alternate;
+  background-position: center right;
+  opacity: 0;
+  transition: opacity 1s ease;
 }
-@keyframes parallax-drift {
-  from { transform: scale(1.06) translateY(0); }
-  to   { transform: scale(1.06) translateY(-3%); }
-}
+.hero-bg.active { opacity: 1; }
 
-.scanlines {
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 3px,
-    rgba(0,0,0,0.12) 3px,
-    rgba(0,0,0,0.12) 4px
-  );
-  pointer-events: none;
+.overlay-left {
+  position: absolute; inset: 0;
+  background: linear-gradient(to right, rgba(6,8,18,0.97) 30%, rgba(6,8,18,0.7) 55%, transparent 80%);
+  z-index: 1;
+}
+.overlay-bottom {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(6,8,18,1) 0%, transparent 40%);
+  z-index: 1;
+}
+.overlay-full {
+  position: absolute; inset: 0;
+  background: rgba(6,8,18,0.25);
   z-index: 1;
 }
 
-.hero-gradient {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at center, rgba(10,14,26,0.55) 0%, rgba(10,14,26,0.85) 70%),
-    linear-gradient(to top, rgba(10,14,26,1) 0%, transparent 50%);
-  z-index: 2;
-}
-
-.jp-watermark {
-  position: absolute;
-  right: 2rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: clamp(4rem, 12vw, 10rem);
-  font-weight: 900;
-  color: rgba(0, 240, 255, 0.04);
-  writing-mode: vertical-rl;
-  letter-spacing: 0.1em;
-  user-select: none;
-  z-index: 2;
-}
-
-/* Sakura petals */
-.petals { position: absolute; inset: 0; pointer-events: none; z-index: 3; overflow: hidden; }
-.petal {
-  position: absolute;
-  top: -20px;
-  left: calc(var(--i) * 8%);
-  width: 8px;
-  height: 10px;
-  background: linear-gradient(135deg, var(--pink), rgba(255,45,120,0.3));
-  border-radius: 50% 0 50% 0;
-  opacity: 0.6;
-  animation: petal-fall calc(6s + var(--i) * 0.7s) linear infinite;
-  animation-delay: calc(var(--i) * -0.5s);
-}
-@keyframes petal-fall {
-  0%   { transform: translateY(-20px) rotate(0deg) translateX(0); opacity: 0.7; }
-  25%  { transform: translateY(25vh) rotate(90deg) translateX(20px); }
-  50%  { transform: translateY(50vh) rotate(180deg) translateX(-15px); }
-  75%  { transform: translateY(75vh) rotate(270deg) translateX(10px); }
-  100% { transform: translateY(110vh) rotate(360deg) translateX(-5px); opacity: 0; }
-}
-
+/* ── Content ── */
 .hero-content {
   position: relative;
-  z-index: 4;
-  max-width: 780px;
+  z-index: 10;
+  padding: 0 5vw 5rem;
+  max-width: 700px;
   width: 100%;
-  padding: 0 3rem;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+}
+
+.genre-tag {
+  display: inline-block;
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--pink);
+  border: 1px solid var(--pink);
+  padding: .2rem .7rem;
+  border-radius: 3px;
+  margin-bottom: 1rem;
 }
 
 .hero-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(3rem, 8vw, 6.5rem);
-  line-height: 0.92;
-  letter-spacing: 0.03em;
-  margin: 0 0 0.4rem;
-}
-.gradient-text {
-  background: linear-gradient(135deg, #fff 20%, var(--cyan) 60%, var(--pink) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.hero-subtitle {
-  font-size: 0.95rem;
-  color: var(--cyan);
-  letter-spacing: 0.12em;
-  margin: 0 0 1rem;
-  font-weight: 500;
-}
-.hero-synopsis {
-  font-size: 0.95rem;
-  color: var(--text-muted);
-  line-height: 1.7;
-  max-width: 520px;
-  margin: 0 0 1.5rem;
-}
-
-.hero-stats { display: flex; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
-.stat {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.88rem;
-  color: var(--text-muted);
-  font-weight: 600;
-}
-.stat-icon { color: var(--cyan); font-size: 0.75rem; }
-.stat-icon.star { color: #ffd700; }
-
-.hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
-.btn-watch, .btn-list {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.8rem 1.8rem;
-  border-radius: 6px;
-  font-weight: 800;
-  font-size: 0.9rem;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-  border: none;
-  transition: all 0.25s;
-}
-.btn-watch svg, .btn-list svg { width: 1rem; height: 1rem; }
-.btn-watch {
-  background: linear-gradient(135deg, var(--pink), #a50042);
+  font-size: clamp(3rem, 7vw, 6.5rem);
+  line-height: .95;
+  letter-spacing: .05em;
   color: #fff;
-  box-shadow: 0 0 24px rgba(255,45,120,0.4);
+  text-transform: uppercase;
+  margin: 0 0 1.25rem;
+  text-shadow: 0 2px 40px rgba(0,0,0,.8);
 }
-.btn-watch:hover { box-shadow: 0 0 40px rgba(255,45,120,0.7); transform: translateY(-2px); }
-.btn-list {
-  background: rgba(0,240,255,0.08);
-  color: var(--cyan);
-  border: 1px solid var(--cyan-dim);
-}
-.btn-list:hover { background: rgba(0,240,255,0.16); box-shadow: 0 0 16px rgba(0,240,255,0.2); }
 
-@keyframes pulse-glow-anim {
-  0%, 100% { box-shadow: 0 0 24px rgba(255,45,120,0.4); }
-  50%       { box-shadow: 0 0 50px rgba(255,45,120,0.8), 0 0 80px rgba(255,45,120,0.3); }
+.synopsis-wrap { margin-bottom: 1.75rem; max-width: 480px; }
+.hero-synopsis {
+  font-size: .9rem;
+  color: rgba(255,255,255,.65);
+  line-height: 1.75;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: all .3s;
 }
-.pulse-glow { animation: pulse-glow-anim 2.5s ease-in-out infinite; }
+.hero-synopsis.expanded { -webkit-line-clamp: unset; overflow: visible; }
+.synopsis-more {
+  background: none; border: none;
+  color: var(--cyan); font-size: .78rem; font-weight: 700;
+  cursor: pointer; padding: .35rem 0 0; display: block;
+  transition: color .2s;
+}
+.synopsis-more:hover { color: #fff; }
 
-.hero-bottom-fade {
+/* ── Metadata row ── */
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  padding: 0 1.25rem 0 0;
+  border-left: 2px solid var(--pink);
+  padding-left: .75rem;
+}
+.meta-label {
+  font-size: .58rem;
+  font-weight: 800;
+  letter-spacing: .15em;
+  color: var(--pink);
+  text-transform: uppercase;
+  margin-bottom: .2rem;
+}
+.meta-value {
+  font-size: .88rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: .05em;
+}
+.status-airing { color: #6eff6e; }
+.status-done   { color: rgba(255,255,255,.7); }
+.meta-divider  { display: none; }
+
+/* ── Actions ── */
+.hero-actions { display: flex; gap: .85rem; flex-wrap: wrap; }
+
+.btn-watch, .btn-details {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .75rem 1.75rem;
+  font-size: .82rem; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase;
+  border-radius: 4px; cursor: pointer;
+  border: none; transition: all .25s;
+}
+.btn-watch svg, .btn-details svg { width: 1rem; height: 1rem; flex-shrink: 0; }
+
+.btn-watch {
+  background: #c0392b;
+  color: #fff;
+  box-shadow: 0 0 24px rgba(192,57,43,.5);
+}
+.btn-watch:hover { background: #e74c3c; box-shadow: 0 0 36px rgba(231,76,60,.7); transform: translateY(-2px); }
+
+.btn-details {
+  background: rgba(255,255,255,.08);
+  color: rgba(255,255,255,.85);
+  border: 1px solid rgba(255,255,255,.25);
+  backdrop-filter: blur(8px);
+}
+.btn-details:hover { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.5); }
+
+/* ── Carousel dots ── */
+.carousel-dots {
   position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 120px;
-  background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
-  z-index: 3;
+  bottom: 2rem;
+  right: 5vw;
+  display: flex;
+  gap: .5rem;
+  z-index: 10;
+}
+.dot {
+  width: 28px; height: 3px;
+  border-radius: 2px;
+  border: none; cursor: pointer;
+  background: rgba(255,255,255,.25);
+  transition: all .3s;
+  padding: 0;
+}
+.dot.active { width: 48px; background: #c0392b; }
+.dot:hover:not(.active) { background: rgba(255,255,255,.5); }
+
+/* ── Scroll hint ── */
+.scroll-hint {
+  position: absolute;
+  right: 2rem; bottom: 6rem;
+  display: flex; flex-direction: column;
+  align-items: center; gap: .5rem;
+  z-index: 10;
+}
+.scroll-text {
+  font-size: .55rem; font-weight: 800;
+  letter-spacing: .25em; color: rgba(255,255,255,.3);
+  writing-mode: vertical-rl;
+  text-transform: uppercase;
+}
+.scroll-line {
+  width: 1px; height: 48px;
+  background: linear-gradient(to bottom, rgba(255,255,255,.3), transparent);
+  animation: scroll-pulse 2s ease-in-out infinite;
+}
+@keyframes scroll-pulse {
+  0%,100% { opacity: .4; transform: scaleY(1); }
+  50%      { opacity: 1; transform: scaleY(1.15); }
 }
 
-/* Skeleton */
-.skeleton { background: linear-gradient(90deg, #1a2240 25%, #222d4d 50%, #1a2240 75%); background-size: 200%; animation: shimmer 1.6s infinite; border-radius: 6px; }
-@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-.sk-badge { width: 120px; height: 24px; margin-bottom: 1.2rem; }
-.sk-title { width: 70%; height: 80px; margin-bottom: 0.6rem; }
-.sk-sub   { width: 40%; height: 20px; margin-bottom: 1rem; }
-.sk-synopsis { width: 90%; height: 60px; }
+/* ── Fade transition ── */
+.hero-fade-enter-active { transition: opacity .5s ease, transform .5s ease; }
+.hero-fade-leave-active { transition: opacity .4s ease, transform .4s ease; position: absolute; }
+.hero-fade-enter-from   { opacity: 0; transform: translateY(16px); }
+.hero-fade-leave-to     { opacity: 0; transform: translateY(-8px); }
+
+/* ── Skeleton ── */
+.skeleton { background: linear-gradient(90deg,rgba(255,255,255,.05) 25%,rgba(255,255,255,.1) 50%,rgba(255,255,255,.05) 75%); background-size:200%; animation:shimmer 1.6s infinite; border-radius:4px; }
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+.sk-tag     { width: 80px; height: 22px; margin-bottom: 1rem; }
+.sk-title   { width: 80%; height: 72px; margin-bottom: .4rem; }
+.sk-title2  { width: 55%; height: 72px; margin-bottom: 1.25rem; }
+.sk-synopsis{ width: 90%; height: 52px; margin-bottom: 1.75rem; }
+.sk-meta    { width: 70%; height: 40px; margin-bottom: 2rem; }
+.sk-btns    { display: flex; gap: .85rem; }
+.sk-btn     { width: 130px; height: 44px; }
 
 @media (max-width: 768px) {
+  .hero { align-items: flex-end; }
   .hero-content { padding: 0 1.5rem 5rem; }
-  .jp-watermark { display: none; }
+  .carousel-dots { right: 1.5rem; bottom: 1.5rem; }
+  .scroll-hint { display: none; }
+  .overlay-left { background: linear-gradient(to right, rgba(6,8,18,0.95) 0%, rgba(6,8,18,0.6) 70%, transparent 100%); }
 }
 </style>

@@ -10,10 +10,10 @@ import CommunitySection from '../components/CommunitySection.vue'
 import AppFooter       from '../components/AppFooter.vue'
 
 import {
-  getHero, getTrending, getSeasonal, getGenres, getTop, getCommunity,
+  getTrending, getSeasonal, getGenres, getTop, getCommunity,
 } from '../services/api.js'
 
-const hero      = ref(null)
+const featured  = ref([])   // carousel items for hero
 const trending  = ref([])
 const seasonal  = ref([])
 const genres    = ref([])
@@ -32,16 +32,20 @@ function settle(result, ref, key) {
 
 async function fetchAll() {
   // Jikan rate-limit: 3 req/sec — fire in two staggered batches
-  const [h, t, s] = await Promise.allSettled([
-    getHero(), getTrending(), getSeasonal(),
+  const [t, s] = await Promise.allSettled([
+    getTrending(), getSeasonal(),
   ])
   await new Promise(r => setTimeout(r, 400))
   const [g, tp, c] = await Promise.allSettled([
     getGenres(), getTop(), getCommunity(),
   ])
 
-  settle(h,  hero,      'hero')
-  settle(t,  trending,  'trending')
+  if (t.status === 'fulfilled') {
+    trending.value  = t.value.data
+    featured.value  = t.value.data.filter(a => a.synopsis && a.image).slice(0, 6)
+  }
+  loading.value.hero     = false
+  loading.value.trending = false
   settle(s,  seasonal,  'seasonal')
   settle(g,  genres,    'genres')
   settle(tp, top,       'top')
@@ -68,7 +72,7 @@ onMounted(async () => {
 <template>
   <div class="page">
     <AppNavbar />
-    <HeroSection :hero="hero" :loading="loading.hero" />
+    <HeroSection :items="featured" :loading="loading.hero" />
 
     <main class="main-content">
       <TrendingNow  :items="trending"  :loading="loading.trending"  />

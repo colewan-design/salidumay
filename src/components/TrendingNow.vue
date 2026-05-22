@@ -10,7 +10,7 @@ defineProps({ items: { type: Array, default: () => [] }, loading: Boolean })
         <span class="section-tag cyan">Trending</span>
         <h2 class="section-title">Trending <span class="accent">Now</span></h2>
       </div>
-      <a href="#" class="see-all">View All →</a>
+      <router-link to="/trending" class="see-all">View All →</router-link>
     </div>
 
     <div class="scroll-container" v-if="!loading">

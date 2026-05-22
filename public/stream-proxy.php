@@ -14,7 +14,15 @@ if (!$url) {
 $parsed = parse_url($url);
 $host   = $parsed['host'] ?? '';
 
-$allowed = ['cinewave2.site', 'miruro', 'watching.onl', 'lostproject.club', 'anikoto'];
+$allowed = [
+    'cinewave2.site', 'miruro', 'watching.onl', 'lostproject.club', 'anikoto',
+    // Gogoanime CDNs
+    'gogocdn.net', 'gogoplay', 'gogoanime', 'gogo-cdn', 'anihdplay',
+    // Zoro / Aniwatch CDNs
+    'megacloud.tv', 'rapid-cloud.co', 'rabbitstream.net',
+    // General anime CDNs
+    'cdn.plyr.io', 'cache.libass.net',
+];
 $ok = false;
 foreach ($allowed as $d) {
     if (str_contains($host, $d)) { $ok = true; break; }

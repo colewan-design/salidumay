@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 defineProps({ genres: { type: Array, default: () => [] }, loading: Boolean })
-const active = ref(null)
+const router = useRouter()
+function goToGenre(name) { router.push({ name: 'genre', params: { genre: name } }) }
 </script>
 
 <template>
@@ -18,8 +19,7 @@ const active = ref(null)
         v-for="g in genres"
         :key="g.name"
         class="genre-pill"
-        :class="{ active: active === g.name }"
-        @click="active = active === g.name ? null : g.name"
+        @click="goToGenre(g.name)"
       >
         <span class="genre-icon">{{ g.icon }}</span>
         <span class="genre-name">{{ g.name }}</span>

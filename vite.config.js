@@ -14,6 +14,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/video-proxy/, ''),
       },
+      '/consumet': {
+        target: 'https://consumet-api.vercel.app',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/consumet/, ''),
+      },
       '/animex': {
         target: 'https://animex.wrdd.site',
         changeOrigin: true,

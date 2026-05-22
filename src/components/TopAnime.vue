@@ -9,7 +9,7 @@ defineProps({ items: { type: Array, default: () => [] }, loading: Boolean })
         <span class="section-tag pink">Hall of Fame</span>
         <h2 class="section-title">Top Anime <span class="accent">All Time</span></h2>
       </div>
-      <a href="#" class="see-all">Full Rankings →</a>
+      <router-link to="/rankings" class="see-all">Full Rankings →</router-link>
     </div>
 
     <div class="top-list" v-if="!loading">

@@ -116,6 +116,30 @@ export const getEpisodes = async (id) => {
   return { data: data.data || [] }
 }
 
+export const getMovies = async (page = 1) => {
+  const { data } = await backend.get('/movies', { params: { page } })
+  return {
+    data: (data.data || []).map(normalizeAnime),
+    pagination: data.pagination || {},
+  }
+}
+
+export const getRankings = async (page = 1) => {
+  const { data } = await backend.get('/rankings', { params: { page } })
+  return {
+    data: (data.data || []).map(normalizeAnime),
+    pagination: data.pagination || {},
+  }
+}
+
+export const getByGenre = async (genre, page = 1) => {
+  const { data } = await backend.get(`/genre/${encodeURIComponent(genre)}`, { params: { page } })
+  return {
+    data: (data.data || []).map(normalizeAnime),
+    pagination: data.pagination || {},
+  }
+}
+
 export const getRelated = async (id) => {
   const { data } = await backend.get(`/${id}/related`)
   return { data: (data.data || []).map(normalizeAnime) }

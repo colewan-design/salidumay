@@ -1,4 +1,5 @@
 import { animexSearch, animexBestMatch, animexEpisodeSources } from './animex.js'
+import { getGogoanimeStreams, getZoroStreams } from './consumet.js'
 
 function slugify(title) {
   return title
@@ -24,25 +25,20 @@ export async function getAnimexSources(title, ep) {
     }))
 }
 
-// ── Source 2: JustAnime ──────────────────────────────────────────
-export function getJustAnimeSources(title, ep) {
-  const slug = slugify(title)
-  return [
-    {
-      label : 'JustAnime',
-      url   : `https://justanime.to/watch/${slug}-episode-${ep}`,
-      group : 'JustAnime',
-    },
-  ]
+// ── Source 2: Gogoanime (via Consumet) ────────────────────────────
+export async function getGogoanime(title, ep) {
+  return getGogoanimeStreams(title, ep)
 }
 
-// ── Source 3: Anikoto ────────────────────────────────────────────
-export async function getAnikotoSources(title, ep) {
-  const proxyBase = import.meta.env.PROD
-    ? '/anikoto-proxy.php'
-    : null
+// ── Source 3: Zoro / Aniwatch (via Consumet) ──────────────────────
+export async function getZoro(title, ep) {
+  return getZoroStreams(title, ep)
+}
 
-  if (!proxyBase) return []   // dev: skip (proxy only works on server)
+// ── Source 4: Anikoto ────────────────────────────────────────────
+export async function getAnikotoSources(title, ep) {
+  const proxyBase = import.meta.env.PROD ? '/anikoto-proxy.php' : null
+  if (!proxyBase) return []
 
   try {
     const res  = await fetch(`${proxyBase}?q=${encodeURIComponent(title)}&ep=${ep}`)
@@ -54,18 +50,52 @@ export async function getAnikotoSources(title, ep) {
   }
 }
 
-// ── Aggregate all sources ────────────────────────────────────────
+// ── Source 5: JustAnime (iframe) ─────────────────────────────────
+export function getJustAnimeSources(title, ep) {
+  const slug = slugify(title)
+  return [{ label: 'JustAnime', url: `https://justanime.to/watch/${slug}-episode-${ep}`, group: 'JustAnime' }]
+}
+
+// ── Source 6: Anitaku / Gogoanime mirror (iframe) ─────────────────
+export function getAnitakuSources(title, ep) {
+  const slug = slugify(title)
+  return [{ label: 'Anitaku', url: `https://anitaku.pe/watch/${slug}-episode-${ep}`, group: 'Anitaku' }]
+}
+
+// ── Source 7: Gogoanime3 (iframe) ─────────────────────────────────
+export function getGogoanime3Sources(title, ep) {
+  const slug = slugify(title)
+  return [{ label: 'Gogoanime', url: `https://gogoanime3.co/watch/${slug}-episode-${ep}`, group: 'Gogoanime3' }]
+}
+
+// ── Source 8: Yugen Anime (iframe) ───────────────────────────────
+export function getYugenSources(title, ep) {
+  const slug = slugify(title)
+  return [{ label: 'Yugen', url: `https://yugenanime.sx/watch/${slug}/${ep}/`, group: 'Yugen' }]
+}
+
+// ── Aggregate all sources ─────────────────────────────────────────
 export async function getAllSources(title, ep) {
-  const [animexSrcs, anikotoSrcs] = await Promise.allSettled([
+  const [animexRes, gogoanimeRes, zoroRes, anikotoRes] = await Promise.allSettled([
     getAnimexSources(title, ep),
+    getGogoanime(title, ep),
+    getZoro(title, ep),
     getAnikotoSources(title, ep),
   ])
 
-  const justAnimeSrcs = getJustAnimeSources(title, ep)
+  // Iframe sources (instant, no async needed)
+  const iframeSources = [
+    ...getJustAnimeSources(title, ep),
+    ...getAnitakuSources(title, ep),
+    ...getGogoanime3Sources(title, ep),
+    ...getYugenSources(title, ep),
+  ]
 
   return [
-    ...(animexSrcs.status   === 'fulfilled' ? animexSrcs.value   : []),
-    ...(anikotoSrcs.status  === 'fulfilled' ? anikotoSrcs.value  : []),
-    ...justAnimeSrcs,
+    ...(animexRes.status    === 'fulfilled' ? animexRes.value    : []),
+    ...(gogoanimeRes.status === 'fulfilled' ? gogoanimeRes.value : []),
+    ...(zoroRes.status      === 'fulfilled' ? zoroRes.value      : []),
+    ...(anikotoRes.status   === 'fulfilled' ? anikotoRes.value   : []),
+    ...iframeSources,
   ]
 }
