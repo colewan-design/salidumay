@@ -1,10 +1,9 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppNavbar from '../components/AppNavbar.vue'
 import { getAnimeDetail, getEpisodes, getRelated, getStreamingLinks } from '../services/api.js'
-import { hiAnimeEnabled, hiSearch, hiEpisodes, hiStream, bestMatch } from '../services/hiAnime.js'
-import { animexSearch, animexBestMatch, animexEpisodeSources } from '../services/animex.js'
+import { getAllSources } from '../services/streamSources.js'
 
 const route  = useRoute()
 const router = useRouter()
@@ -21,250 +20,45 @@ const activeTab      = ref('episodes')
 const audioMode      = ref('sub') // 'sub' | 'dub'
 
 /* ── Streaming state ── */
-const streamSrc     = ref('')
-const streamIsHls   = ref(false)
 const streamLoading = ref(false)
 const streamError   = ref('')
-const showTrailer   = ref(false)
-const subtitleTracks = ref([])
-
-const hiId  = ref(null)   // HiAnime anime slug
-const hiEps = ref([])     // HiAnime episode list
-
-const animexId      = ref(null)  // AnimeX anilist ID
-const animexSources = ref([])    // all iframe sources for current episode
-const animexSrc     = ref('')    // currently displayed iframe URL
-
-let hlsInstance = null
-
-/* ── Video player refs ── */
-const videoEl    = ref(null)
-const playerWrap = ref(null)
-
-const isPlaying     = ref(false)
-const isMuted       = ref(false)
-const isFullscreen  = ref(false)
-const volume        = ref(1)
-const currentTime   = ref(0)
-const duration      = ref(0)
-const buffered      = ref(0)
-const showControls  = ref(true)
-const showIntroSkip = ref(false)
-const playWhenReady = ref(false)
-const speed         = ref(1)
-const showSpeedMenu = ref(false)
-const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2]
-
-let hideTimer = null
+const allSources    = ref([])   // all available iframe sources
+const activeSrc     = ref('')   // currently displayed iframe URL
+const activeGroup   = ref('')   // active source group label
 
 /* ── Computed ── */
 const currentEpisode = computed(() => episodes.value.find(e => e.number === currentEp.value) || null)
 const hasNext = computed(() => episodes.value.some(e => e.number === currentEp.value + 1))
 const hasPrev = computed(() => episodes.value.some(e => e.number === currentEp.value - 1))
-const progressPct = computed(() => duration.value ? (currentTime.value / duration.value) * 100 : 0)
-const bufferedPct = computed(() => duration.value ? (buffered.value / duration.value) * 100 : 0)
-const timeDisplay = computed(() => `${fmt(currentTime.value)} / ${fmt(duration.value)}`)
-const hasHlsStream    = computed(() => !!streamSrc.value)
-const hasIframeStream = computed(() => !!animexSrc.value)
-const hasStream       = computed(() => hasHlsStream.value || hasIframeStream.value)
-
-function fmt(s) {
-  const m  = Math.floor(s / 60)
-  const ss = Math.floor(s % 60).toString().padStart(2, '0')
-  return `${m}:${ss}`
-}
+const hasStream   = computed(() => !!activeSrc.value)
 
 const serviceIcons = {
   Crunchyroll: '🟠', Netflix: '🔴', Funimation: '🟣',
   'Amazon Prime Video': '🔵', 'Disney+': '🔷', HIDIVE: '🟦', Hulu: '🟢',
 }
 
-/* ── HLS helpers ── */
-function destroyHls() {
-  if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null }
-}
-
-async function applyStream(src, isHls) {
-  if (!videoEl.value) return
-  destroyHls()
-  showTrailer.value = false
-
-  if (isHls) {
-    const Hls = (await import('hls.js')).default
-    if (Hls.isSupported()) {
-      hlsInstance = new Hls({ enableWorker: true, maxBufferLength: 30 })
-      hlsInstance.loadSource(src)
-      hlsInstance.attachMedia(videoEl.value)
-      hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
-        videoEl.value?.play().catch(() => {})
-      })
-      hlsInstance.on(Hls.Events.ERROR, (_, d) => {
-        if (d.fatal) { destroyHls(); showTrailer.value = !!anime.value?.trailerUrl }
-      })
-    } else if (videoEl.value.canPlayType('application/vnd.apple.mpegurl')) {
-      videoEl.value.src = src
-      videoEl.value.play().catch(() => {})
-    } else {
-      showTrailer.value = !!anime.value?.trailerUrl
-    }
-  } else {
-    videoEl.value.src = src
-    videoEl.value.play().catch(() => {})
-  }
-
-  // Attach subtitle tracks if available
-  if (subtitleTracks.value.length && videoEl.value) {
-    subtitleTracks.value.forEach(t => {
-      const track = document.createElement('track')
-      track.kind    = 'subtitles'
-      track.label   = t.label || 'English'
-      track.srclang = t.lang || 'en'
-      track.src     = t.file
-      if (t.default) track.default = true
-      videoEl.value.appendChild(track)
-    })
-  }
-}
-
-/* ── HiAnime: find anime + load stream ── */
-async function findHiAnime(title) {
-  if (!hiAnimeEnabled) return
-  try {
-    const results = await hiSearch(title)
-    const match   = bestMatch(results, title)
-    if (!match) return
-    hiId.value  = match.id
-    hiEps.value = await hiEpisodes(match.id)
-  } catch { /* silent */ }
-}
-
-/* ── AnimeX: find anime by title ── */
-async function findAnimex(title) {
-  try {
-    const results = await animexSearch(title)
-    const match   = animexBestMatch(results, title)
-    if (match) animexId.value = match.id
-  } catch { /* silent */ }
-}
-
-/* ── Select an AnimeX source from the server picker ── */
 function selectSource(src) {
-  animexSrc.value = src.url
+  activeSrc.value   = src.url
+  activeGroup.value = src.group
 }
 
 async function loadEpisodeStream(epNum) {
-  streamSrc.value     = ''
-  animexSrc.value     = ''
-  animexSources.value = []
+  activeSrc.value     = ''
+  allSources.value    = []
   streamError.value   = ''
-  showTrailer.value   = false
+  streamLoading.value = true
 
-  // ── 1. Try HiAnime (HLS) ──
-  if (hiAnimeEnabled && hiId.value) {
-    streamLoading.value = true
-    try {
-      const hiEp = hiEps.value.find(e => e.number === epNum)
-      if (!hiEp) throw new Error(`episode ${epNum} not on HiAnime`)
-
-      const streamData = await hiStream(hiEp.episodeId, audioMode.value)
-      if (!streamData) throw new Error('no stream data')
-
-      const src   = streamData.sources?.[0]?.url
-      const isHls = streamData.sources?.[0]?.type === 'hls'
-      if (!src) throw new Error('no source URL')
-
-      subtitleTracks.value = (streamData.tracks || []).filter(t => t.kind === 'captions' || t.kind === 'thumbnails' || !t.kind)
-      streamSrc.value   = src
-      streamIsHls.value = isHls
-
-      await nextTick()
-      await applyStream(src, isHls)
-      streamLoading.value = false
-      return
-    } catch (e) {
-      streamError.value = e.message
+  try {
+    const sources = await getAllSources(anime.value.title, epNum)
+    allSources.value = sources
+    if (sources.length) {
+      activeSrc.value   = sources[0].url
+      activeGroup.value = sources[0].group
     }
-    streamLoading.value = false
+  } catch (e) {
+    streamError.value = e.message
   }
-
-  // ── 2. Fall back to AnimeX iframes ──
-  if (animexId.value) {
-    streamLoading.value = true
-    try {
-      const { sources } = await animexEpisodeSources(animexId.value, epNum)
-      if (!sources.length) throw new Error('no AnimeX sources')
-
-      animexSources.value = sources
-      // Pick best for current audio mode (prefer 1080p)
-      const forLang  = sources.filter(s => s.lang?.toLowerCase() === audioMode.value)
-      const best     = forLang.find(s => s.quality === '1080p') || forLang[0] || sources[0]
-      animexSrc.value = best.url
-      streamLoading.value = false
-      return
-    } catch (e) {
-      streamError.value = (streamError.value ? streamError.value + '; ' : '') + e.message
-    }
-    streamLoading.value = false
-  }
-
-  // ── 3. Final fallback: trailer ──
-  showTrailer.value = !!anime.value?.trailerUrl
-}
-
-/* ── Video player controls ── */
-function togglePlay() {
-  if (!videoEl.value) return
-  if (isPlaying.value) videoEl.value.pause()
-  else videoEl.value.play().catch(() => {})
-}
-function onPlay()    { isPlaying.value = true }
-function onPause()   { isPlaying.value = false }
-function onCanPlay() { if (playWhenReady.value) { playWhenReady.value = false; videoEl.value?.play().catch(() => {}) } }
-function onTimeUpdate() {
-  if (!videoEl.value) return
-  currentTime.value = videoEl.value.currentTime
-  showIntroSkip.value = currentTime.value < 90
-  if (videoEl.value.buffered.length)
-    buffered.value = videoEl.value.buffered.end(videoEl.value.buffered.length - 1)
-}
-function onLoadedMeta() { if (videoEl.value) duration.value = videoEl.value.duration }
-function seek(e) {
-  if (!videoEl.value || !duration.value) return
-  const rect = e.currentTarget.getBoundingClientRect()
-  videoEl.value.currentTime = ((e.clientX - rect.left) / rect.width) * duration.value
-}
-function setVolume(e) {
-  const v = parseFloat(e.target.value)
-  volume.value = v
-  if (videoEl.value) videoEl.value.volume = v
-  isMuted.value = v === 0
-}
-function toggleMute() { if (!videoEl.value) return; isMuted.value = !isMuted.value; videoEl.value.muted = isMuted.value }
-function skipIntro()  { if (videoEl.value) videoEl.value.currentTime = 90; showIntroSkip.value = false }
-function setSpeed(s)  { speed.value = s; if (videoEl.value) videoEl.value.playbackRate = s; showSpeedMenu.value = false }
-function toggleFullscreen() {
-  if (!playerWrap.value) return
-  if (!document.fullscreenElement) playerWrap.value.requestFullscreen()
-  else document.exitFullscreen()
-}
-function onFullscreenChange() { isFullscreen.value = !!document.fullscreenElement }
-function skip(s) { if (videoEl.value) videoEl.value.currentTime = Math.max(0, videoEl.value.currentTime + s) }
-function resetHideTimer() {
-  showControls.value = true
-  clearTimeout(hideTimer)
-  hideTimer = setTimeout(() => { if (isPlaying.value) showControls.value = false }, 3000)
-}
-function onMouseLeave() { if (isPlaying.value) showControls.value = false }
-function onKeydown(e) {
-  const tag = document.activeElement?.tagName
-  if (tag === 'INPUT' || tag === 'TEXTAREA') return
-  if (e.code === 'Space')      { e.preventDefault(); togglePlay() }
-  if (e.code === 'ArrowRight') skip(10)
-  if (e.code === 'ArrowLeft')  skip(-10)
-  if (e.code === 'ArrowUp')    { volume.value = Math.min(1, volume.value + 0.1); if (videoEl.value) videoEl.value.volume = volume.value }
-  if (e.code === 'ArrowDown')  { volume.value = Math.max(0, volume.value - 0.1); if (videoEl.value) videoEl.value.volume = volume.value }
-  if (e.code === 'KeyF')       toggleFullscreen()
-  if (e.code === 'KeyM')       toggleMute()
+  streamLoading.value = false
 }
 
 /* ── Episode navigation ── */
@@ -276,22 +70,11 @@ function watchEp(ep) {
 function nextEpisode() { const n = episodes.value.find(e => e.number === currentEp.value + 1); if (n) watchEp(n) }
 function prevEpisode() { const p = episodes.value.find(e => e.number === currentEp.value - 1); if (p) watchEp(p) }
 
-function switchAudio(mode) {
-  audioMode.value = mode
-  loadEpisodeStream(currentEp.value)
-}
-
 /* ── Data fetch ── */
 async function fetchData() {
-  loading.value  = true
-  destroyHls()
-  streamSrc.value     = ''
-  animexSrc.value     = ''
-  animexSources.value = []
-  showTrailer.value   = false
-  hiId.value    = null
-  hiEps.value   = []
-  animexId.value = null
+  loading.value   = true
+  activeSrc.value = ''
+  allSources.value = []
 
   const [ad, ep, rel, sl] = await Promise.allSettled([
     getAnimeDetail(animeId.value),
@@ -299,39 +82,21 @@ async function fetchData() {
     getRelated(animeId.value),
     getStreamingLinks(animeId.value),
   ])
-  if (ad.status  === 'fulfilled') anime.value          = ad.value.data
-  if (ep.status  === 'fulfilled') episodes.value       = ep.value.data
-  if (rel.status === 'fulfilled') related.value        = rel.value.data
-  if (sl.status  === 'fulfilled') streamingLinks.value = sl.value.data
+  if (ad.status === 'fulfilled') anime.value          = ad.value.data
+  if (ep.status === 'fulfilled') episodes.value       = ep.value.data
+  if (rel.status === 'fulfilled') related.value       = rel.value.data
+  if (sl.status === 'fulfilled') streamingLinks.value = sl.value.data
   loading.value = false
 
   if (anime.value?.title) {
-    await Promise.allSettled([
-      findHiAnime(anime.value.title),
-      findAnimex(anime.value.title),
-    ])
     await loadEpisodeStream(currentEp.value)
-  } else {
-    showTrailer.value = !!anime.value?.trailerUrl
   }
 }
 
 watch(() => route.params.id, () => { currentEp.value = 1; fetchData() })
 
-onMounted(async () => {
-  await fetchData()
-  document.addEventListener('keydown', onKeydown)
-  document.addEventListener('fullscreenchange', onFullscreenChange)
-  await nextTick()
-  if (videoEl.value) videoEl.value.volume = volume.value
-})
-
-onUnmounted(() => {
-  destroyHls()
-  document.removeEventListener('keydown', onKeydown)
-  document.removeEventListener('fullscreenchange', onFullscreenChange)
-  clearTimeout(hideTimer)
-})
+onMounted(fetchData)
+onUnmounted(() => {})
 </script>
 
 <template>
@@ -361,9 +126,9 @@ onUnmounted(() => {
             <span class="ep-nav-title">{{ anime?.title }}</span>
             <span class="ep-nav-ep">Episode {{ currentEp }}</span>
           </span>
-          <div class="audio-toggle" v-if="hiAnimeEnabled || animexId">
-            <button :class="['audio-btn', { active: audioMode === 'sub' }]" @click="switchAudio('sub')">SUB</button>
-            <button :class="['audio-btn', { active: audioMode === 'dub' }]" @click="switchAudio('dub')">DUB</button>
+          <div class="audio-toggle" v-if="allSources.length">
+            <button :class="['audio-btn', { active: audioMode === 'sub' }]" @click="audioMode = 'sub'; loadEpisodeStream(currentEp)">SUB</button>
+            <button :class="['audio-btn', { active: audioMode === 'dub' }]" @click="audioMode = 'dub'; loadEpisodeStream(currentEp)">DUB</button>
           </div>
           <button class="ep-nav-btn" :disabled="!hasNext" @click="nextEpisode">
             Next
@@ -372,167 +137,50 @@ onUnmounted(() => {
         </div>
 
         <!-- ── Player ── -->
-        <div
-          ref="playerWrap"
-          :class="['player-wrap', { 'hide-cursor': isPlaying && !showControls && hasHlsStream }]"
-          @mousemove="hasHlsStream && resetHideTimer()"
-          @mouseleave="hasHlsStream && onMouseLeave()"
-        >
-          <!-- Native video (HiAnime HLS stream) -->
-          <video
-            v-show="hasHlsStream && !showTrailer"
-            ref="videoEl"
-            class="video-el"
-            preload="metadata"
-            @play="onPlay"
-            @pause="onPause"
-            @canplay="onCanPlay"
-            @timeupdate="onTimeUpdate"
-            @loadedmetadata="onLoadedMeta"
-            @ended="nextEpisode"
-            @click="togglePlay"
-          ></video>
-
-          <!-- AnimeX iframe stream -->
+        <div class="player-wrap">
+          <!-- Iframe stream -->
           <iframe
-            v-if="hasIframeStream"
+            v-if="hasStream"
             class="video-el"
-            :src="animexSrc"
+            :src="activeSrc"
             allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
             allowfullscreen
             frameborder="0"
             scrolling="no"
           ></iframe>
 
-          <!-- YouTube trailer fallback -->
-          <iframe
-            v-if="showTrailer && anime?.trailerUrl"
-            class="video-el"
-            :src="anime.trailerUrl"
-            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-            allowfullscreen
-            frameborder="0"
-          ></iframe>
-
-          <!-- Stream loading -->
+          <!-- Loading -->
           <div v-if="streamLoading" class="overlay-center">
             <div class="spin"></div>
             <p>Loading stream…</p>
           </div>
 
-          <!-- No stream, no trailer -->
-          <div v-if="!streamLoading && !hasStream && !showTrailer" class="overlay-center">
+          <!-- No source found -->
+          <div v-if="!streamLoading && !hasStream" class="overlay-center">
             <div class="no-video-icon">▶</div>
-            <p>{{ !hiAnimeEnabled && !animexId ? 'No stream source configured' : 'Stream unavailable for this episode' }}</p>
+            <p>No stream available for this episode</p>
           </div>
-
-          <!-- Skip intro -->
-          <Transition name="fade">
-            <button v-if="showIntroSkip && isPlaying && hasHlsStream" class="skip-intro" @click="skipIntro">
-              Skip Intro ⟶
-            </button>
-          </Transition>
-
-          <!-- Big play button -->
-          <Transition name="fade">
-            <div v-if="!isPlaying && hasHlsStream && !showTrailer && !streamLoading" class="big-play" @click="togglePlay">
-              <div class="big-play-btn">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-              </div>
-            </div>
-          </Transition>
-
-          <!-- Controls overlay (only for native video) -->
-          <Transition name="ctrl-fade">
-            <div v-if="hasHlsStream && !showTrailer && (showControls || !isPlaying)" class="controls">
-              <div class="ctrl-top">
-                <span class="ctrl-title">{{ anime?.title }}</span>
-                <span class="ctrl-ep" v-if="currentEpisode">EP {{ currentEp }} — {{ currentEpisode.title }}</span>
-              </div>
-
-              <div class="progress-wrap" @click="seek">
-                <div class="progress-track">
-                  <div class="progress-buffered" :style="{ width: bufferedPct + '%' }"></div>
-                  <div class="progress-fill" :style="{ width: progressPct + '%' }">
-                    <div class="progress-thumb"></div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="ctrl-bottom">
-                <div class="ctrl-left">
-                  <button class="ctrl-btn" :disabled="!hasPrev" @click="prevEpisode">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
-                  </button>
-                  <button class="ctrl-btn play-pause" @click="togglePlay">
-                    <svg v-if="!isPlaying" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                    <svg v-else viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                  </button>
-                  <button class="ctrl-btn" :disabled="!hasNext" @click="nextEpisode">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2-8.14 5.03 3.6L8 17.14V9.86zM16 6h2v12h-2z"/></svg>
-                  </button>
-                  <button class="ctrl-btn" @click="skip(-10)">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
-                  </button>
-                  <button class="ctrl-btn" @click="skip(10)">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 13c0 3.31-2.69 6-6 6s-6-2.69-6-6 2.69-6 6-6v4l5-5-5-5v4c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8h-2z"/></svg>
-                  </button>
-                  <div class="volume-wrap">
-                    <button class="ctrl-btn" @click="toggleMute">
-                      <svg v-if="isMuted || volume === 0" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z"/></svg>
-                      <svg v-else viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-                    </button>
-                    <input type="range" class="volume-slider" min="0" max="1" step="0.05" :value="isMuted ? 0 : volume" @input="setVolume" />
-                  </div>
-                  <span class="ctrl-time">{{ timeDisplay }}</span>
-                </div>
-
-                <div class="ctrl-right">
-                  <div class="menu-wrap">
-                    <button class="ctrl-btn ctrl-text" @click="showSpeedMenu = !showSpeedMenu">{{ speed }}x</button>
-                    <div v-if="showSpeedMenu" class="popup-menu">
-                      <button v-for="s in speeds" :key="s" :class="['menu-item', { active: speed === s }]" @click="setSpeed(s)">{{ s }}x</button>
-                    </div>
-                  </div>
-                  <button class="ctrl-btn" @click="toggleFullscreen">
-                    <svg v-if="!isFullscreen" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-                    <svg v-else viewBox="0 0 24 24" fill="currentColor"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </Transition>
         </div>
 
-        <!-- AnimeX server picker -->
-        <div v-if="animexSources.length" class="server-bar">
-          <span class="server-label">Server</span>
+        <!-- Source picker -->
+        <div v-if="allSources.length" class="server-bar">
+          <span class="server-label">Source</span>
           <button
-            v-for="src in animexSources"
+            v-for="src in allSources"
             :key="src.url"
-            :class="['server-btn', { active: animexSrc === src.url }]"
+            :class="['server-btn', { active: activeSrc === src.url }]"
             @click="selectSource(src)"
           >
-            {{ src.lang?.toUpperCase() }} {{ src.quality }}
+            {{ src.label }}
           </button>
         </div>
 
-        <!-- Keyboard shortcuts (only when HLS streaming) -->
-        <div v-if="hasHlsStream" class="shortcuts-bar">
-          <span class="shortcut"><kbd>Space</kbd> Play/Pause</span>
-          <span class="shortcut"><kbd>←</kbd><kbd>→</kbd> ±10s</span>
-          <span class="shortcut"><kbd>↑</kbd><kbd>↓</kbd> Volume</span>
-          <span class="shortcut"><kbd>F</kbd> Fullscreen</span>
-          <span class="shortcut"><kbd>M</kbd> Mute</span>
-        </div>
-
-        <!-- Trailer notice when showing fallback -->
-        <div v-if="showTrailer && anime?.trailerUrl" class="trailer-notice">
+        <!-- No source notice -->
+        <div v-if="!streamLoading && !hasStream && !allSources.length" class="trailer-notice">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="notice-icon">
             <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
-          {{ !hiAnimeEnabled && !animexId ? 'Add VITE_HIANIME_API or configure AnimeX for streaming.' : 'Stream unavailable — showing official trailer.' }}
-          <span v-if="streamError" class="error-detail">({{ streamError }})</span>
+          Stream unavailable for this episode. Try another episode or check back later.
         </div>
 
         <!-- Licensed streaming links -->
@@ -624,11 +272,9 @@ onUnmounted(() => {
             <div class="dt-row" v-if="anime.year"><span class="dt-key">Year</span><span class="dt-val">{{ anime.year }}</span></div>
             <div class="dt-row" v-if="anime.studio"><span class="dt-key">Studio</span><span class="dt-val">{{ anime.studio }}</span></div>
             <div class="dt-row" v-if="anime.genre"><span class="dt-key">Genre</span><span class="dt-val">{{ anime.genre }}</span></div>
-            <div class="dt-row" v-if="hiAnimeEnabled || animexId">
+            <div class="dt-row" v-if="allSources.length">
               <span class="dt-key">Stream</span>
-              <span :class="['dt-val', hiId ? 'text-cyan' : animexId ? 'text-green' : 'text-muted']">
-                {{ hiId ? 'HiAnime ✓' : animexId ? 'AnimeX ✓' : 'Not matched' }}
-              </span>
+              <span class="dt-val text-cyan">{{ allSources[0]?.group || 'Available' }} ✓</span>
             </div>
           </div>
         </template>

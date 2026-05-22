@@ -28,9 +28,11 @@ const navLinks = [
 const isOnWatch = () => route.path.startsWith('/watch')
 
 function submitSearch() {
-  if (searchQuery.value.trim()) {
-    router.push('/watch')
+  const q = searchQuery.value.trim()
+  if (q) {
+    router.push({ path: '/watch', query: { q } })
     searchOpen.value = false
+    searchQuery.value = ''
   }
 }
 </script>

@@ -14,12 +14,12 @@ defineProps({ items: { type: Array, default: () => [] }, loading: Boolean })
 
     <div class="top-list" v-if="!loading">
       <article
-        v-for="anime in items"
-        :key="anime.rank"
+        v-for="(anime, i) in items"
+        :key="anime.id ?? i"
         class="top-item"
       >
-        <span class="rank" :class="{ gold: anime.rank === 1, silver: anime.rank === 2, bronze: anime.rank === 3 }">
-          {{ anime.rank <= 3 ? ['🥇','🥈','🥉'][anime.rank - 1] : `#${anime.rank}` }}
+        <span class="rank" :class="{ gold: i === 0, silver: i === 1, bronze: i === 2 }">
+          {{ i < 3 ? ['🥇','🥈','🥉'][i] : `#${i + 1}` }}
         </span>
         <img class="top-thumb" :src="anime.image" :alt="anime.title" loading="lazy" />
         <div class="top-info">
@@ -27,7 +27,7 @@ defineProps({ items: { type: Array, default: () => [] }, loading: Boolean })
           <span class="top-studio">{{ anime.studio }} · {{ anime.year }}</span>
         </div>
         <div class="top-score">
-          <span class="score-value">{{ anime.score.toFixed(2) }}</span>
+          <span class="score-value">{{ typeof anime.rating === 'number' ? anime.rating.toFixed(2) : anime.rating }}</span>
           <span class="score-label">Score</span>
         </div>
       </article>

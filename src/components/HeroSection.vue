@@ -48,7 +48,7 @@ function watchNow() {
         </div>
         <div class="stat">
           <span class="stat-icon star">★</span>
-          <span>{{ hero.rating.toFixed(1) }}</span>
+          <span>{{ typeof hero.rating === 'number' ? hero.rating.toFixed(1) : hero.rating }}</span>
         </div>
         <div class="stat">
           <span class="stat-icon">🎬</span>

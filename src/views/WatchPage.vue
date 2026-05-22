@@ -1,11 +1,12 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import AppNavbar from '../components/AppNavbar.vue'
 import AppFooter from '../components/AppFooter.vue'
 import { getAnimeList, getGenres, searchAnime } from '../services/api.js'
 
 const router    = useRouter()
+const route     = useRoute()
 const allAnime  = ref([])
 const baseAnime = ref([])
 const genres    = ref([])
@@ -68,6 +69,8 @@ onMounted(async () => {
   if (al.status === 'fulfilled') { allAnime.value = al.value.data; baseAnime.value = al.value.data }
   if (gl.status === 'fulfilled') genres.value = ['All', ...gl.value.data.map(g => g.name)]
   loading.value = false
+
+  if (route.query.q) searchQuery.value = String(route.query.q)
 })
 </script>
 

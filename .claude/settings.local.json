@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\salidumay\" -Force)",
+      "Bash(Select-Object Name, FullName)",
+      "PowerShell(ls -R \"C:\\\\salidumay\")",
+      "PowerShell(head -100)",
+      "Bash(ls -la \"C:\\\\salidumay-api\" 2>/dev/null | head -50)",
+      "Read(//c/salidumay-api/**)",
+      "WebFetch(domain:anime-api-sigma-livid.vercel.app)"
+    ]
+  }
+}
