@@ -53,25 +53,25 @@ export async function getAnikotoSources(title, ep) {
 // ── Source 5: JustAnime (iframe) ─────────────────────────────────
 export function getJustAnimeSources(title, ep) {
   const slug = slugify(title)
-  return [{ label: 'JustAnime', url: `https://justanime.to/watch/${slug}-episode-${ep}`, group: 'JustAnime' }]
+  return [{ label: 'JustAnime', url: `https://justanime.to/watch/${slug}-episode-${ep}`, group: 'JustAnime', type: 'iframe' }]
 }
 
 // ── Source 6: Anitaku / Gogoanime mirror (iframe) ─────────────────
 export function getAnitakuSources(title, ep) {
   const slug = slugify(title)
-  return [{ label: 'Anitaku', url: `https://anitaku.pe/watch/${slug}-episode-${ep}`, group: 'Anitaku' }]
+  return [{ label: 'Anitaku', url: `https://anitaku.pe/watch/${slug}-episode-${ep}`, group: 'Anitaku', type: 'iframe' }]
 }
 
 // ── Source 7: Gogoanime3 (iframe) ─────────────────────────────────
 export function getGogoanime3Sources(title, ep) {
   const slug = slugify(title)
-  return [{ label: 'Gogoanime', url: `https://gogoanime3.co/watch/${slug}-episode-${ep}`, group: 'Gogoanime3' }]
+  return [{ label: 'Gogoanime', url: `https://gogoanime3.co/watch/${slug}-episode-${ep}`, group: 'Gogoanime3', type: 'iframe' }]
 }
 
 // ── Source 8: Yugen Anime (iframe) ───────────────────────────────
 export function getYugenSources(title, ep) {
   const slug = slugify(title)
-  return [{ label: 'Yugen', url: `https://yugenanime.sx/watch/${slug}/${ep}/`, group: 'Yugen' }]
+  return [{ label: 'Yugen', url: `https://yugenanime.sx/watch/${slug}/${ep}/`, group: 'Yugen', type: 'iframe' }]
 }
 
 // ── Aggregate all sources ─────────────────────────────────────────

@@ -1,6 +1,7 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import Hls from 'hls.js'
 import AppNavbar from '../components/AppNavbar.vue'
 import CommentSection from '../components/CommentSection.vue'
 import { getAnimeDetail, getEpisodes, getRelated, getStreamingLinks } from '../services/api.js'
@@ -22,30 +23,60 @@ const activeTab      = ref('episodes')
 const audioMode      = ref('sub') // 'sub' | 'dub'
 
 /* ── Streaming state ── */
-const streamLoading = ref(false)
-const streamError   = ref('')
-const allSources    = ref([])   // all available iframe sources
-const activeSrc     = ref('')   // currently displayed iframe URL
-const activeGroup   = ref('')   // active source group label
+const streamLoading  = ref(false)
+const streamError    = ref('')
+const allSources     = ref([])
+const activeSrc      = ref('')
+const activeGroup    = ref('')
+const activeSource   = ref(null)   // full source object
+const videoRef       = ref(null)   // <video> element for HLS
+let   hlsInstance    = null
 
 /* ── Computed ── */
 const currentEpisode = computed(() => episodes.value.find(e => e.number === currentEp.value) || null)
-const hasNext = computed(() => episodes.value.some(e => e.number === currentEp.value + 1))
-const hasPrev = computed(() => episodes.value.some(e => e.number === currentEp.value - 1))
-const hasStream   = computed(() => !!activeSrc.value)
+const hasNext    = computed(() => episodes.value.some(e => e.number === currentEp.value + 1))
+const hasPrev    = computed(() => episodes.value.some(e => e.number === currentEp.value - 1))
+const hasStream  = computed(() => !!activeSrc.value)
+const isHlsSrc   = computed(() => activeSource.value?.type === 'hls')
 
 const serviceIcons = {
   Crunchyroll: '🟠', Netflix: '🔴', Funimation: '🟣',
   'Amazon Prime Video': '🔵', 'Disney+': '🔷', HIDIVE: '🟦', Hulu: '🟢',
 }
 
+/* ── HLS helpers ── */
+function destroyHls() {
+  if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null }
+}
+
+function mountHls(url) {
+  destroyHls()
+  const el = videoRef.value
+  if (!el || !url) return
+
+  if (Hls.isSupported()) {
+    hlsInstance = new Hls({ enableWorker: true, lowLatencyMode: false })
+    hlsInstance.loadSource(url)
+    hlsInstance.attachMedia(el)
+    hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => el.play().catch(() => {}))
+  } else if (el.canPlayType('application/vnd.apple.mpegurl')) {
+    el.src = url
+    el.play().catch(() => {})
+  }
+}
+
 function selectSource(src) {
-  activeSrc.value   = src.url
-  activeGroup.value = src.group
+  destroyHls()
+  activeSource.value = src
+  activeSrc.value    = src.url
+  activeGroup.value  = src.group
+  if (src.type === 'hls') nextTick(() => mountHls(src.url))
 }
 
 async function loadEpisodeStream(epNum) {
+  destroyHls()
   activeSrc.value     = ''
+  activeSource.value  = null
   allSources.value    = []
   streamError.value   = ''
   streamLoading.value = true
@@ -53,10 +84,7 @@ async function loadEpisodeStream(epNum) {
   try {
     const sources = await getAllSources(anime.value.title, epNum)
     allSources.value = sources
-    if (sources.length) {
-      activeSrc.value   = sources[0].url
-      activeGroup.value = sources[0].group
-    }
+    if (sources.length) selectSource(sources[0])
   } catch (e) {
     streamError.value = e.message
   }
@@ -98,7 +126,7 @@ async function fetchData() {
 watch(() => route.params.id, () => { currentEp.value = 1; fetchData() })
 
 onMounted(fetchData)
-onUnmounted(() => {})
+onUnmounted(destroyHls)
 </script>
 
 <template>
@@ -140,9 +168,19 @@ onUnmounted(() => {})
 
         <!-- ── Player ── -->
         <div class="player-wrap">
-          <!-- Iframe stream -->
+          <!-- HLS native video player -->
+          <video
+            v-if="isHlsSrc && hasStream"
+            ref="videoRef"
+            class="video-el"
+            controls
+            playsinline
+            style="background:#000"
+          ></video>
+
+          <!-- Iframe embed player -->
           <iframe
-            v-if="hasStream"
+            v-else-if="!isHlsSrc && hasStream"
             class="video-el"
             :src="activeSrc"
             allow="autoplay; encrypted-media; fullscreen; picture-in-picture"

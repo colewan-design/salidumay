@@ -72,6 +72,7 @@ export async function getGogoanimeStreams(title, ep) {
       label: `Gogoanime${s.quality ? ' · ' + s.quality : ''}`,
       url  : proxyStream(s.url, referer),
       group: 'Gogoanime',
+      type : 'hls',
     }))
 }
 
@@ -122,5 +123,6 @@ export async function getZoroStreams(title, ep) {
       label: `Zoro${s.quality ? ' · ' + s.quality : ''}`,
       url  : proxyStream(s.url, referer),
       group: 'Zoro',
+      type : 'hls',
     }))
 }
