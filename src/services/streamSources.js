@@ -1,5 +1,5 @@
 import { animexSearch, animexBestMatch, animexEpisodeSources } from './animex.js'
-import { getGogoanimeStreams, getZoroStreams } from './consumet.js'
+import { getGogoanimeStreams, getZoroStreams, getAnimePaheSources } from './consumet.js'
 
 function slugify(title) {
   return title
@@ -35,7 +35,12 @@ export async function getZoro(title, ep) {
   return getZoroStreams(title, ep)
 }
 
-// ── Source 4: Anikoto ────────────────────────────────────────────
+// ── Source 4: AnimePahe / Kwik (via Consumet) ─────────────────────
+export async function getAnimePahe(title, ep) {
+  return getAnimePaheSources(title, ep)
+}
+
+// ── Source 5: Anikoto ────────────────────────────────────────────
 export async function getAnikotoSources(title, ep) {
   const proxyBase = import.meta.env.PROD ? '/anikoto-proxy.php' : null
   if (!proxyBase) return []
@@ -59,10 +64,11 @@ export function getJustAnimeSources(title, ep) {
 
 // ── Aggregate all sources ─────────────────────────────────────────
 export async function getAllSources(title, ep) {
-  const [animexRes, gogoanimeRes, zoroRes, anikotoRes] = await Promise.allSettled([
+  const [animexRes, gogoanimeRes, zoroRes, animePaheRes, anikotoRes] = await Promise.allSettled([
     getAnimexSources(title, ep),
     getGogoanime(title, ep),
     getZoro(title, ep),
+    getAnimePahe(title, ep),
     getAnikotoSources(title, ep),
   ])
 
@@ -72,6 +78,7 @@ export async function getAllSources(title, ep) {
     ...(animexRes.status    === 'fulfilled' ? animexRes.value    : []),
     ...(gogoanimeRes.status === 'fulfilled' ? gogoanimeRes.value : []),
     ...(zoroRes.status      === 'fulfilled' ? zoroRes.value      : []),
+    ...(animePaheRes.status === 'fulfilled' ? animePaheRes.value : []),
     ...(anikotoRes.status   === 'fulfilled' ? anikotoRes.value   : []),
     ...iframeSources,
   ]

@@ -76,6 +76,57 @@ export async function getGogoanimeStreams(title, ep) {
     }))
 }
 
+// ── AnimePahe (Kwik CDN) ──────────────────────────────────────────
+export async function animePaheSearch(title) {
+  const { data } = await ax.get(buildUrl(`/anime/animepahe/${encodeURIComponent(title)}`))
+  return data.results || []
+}
+
+export function animePaheMatch(results, title) {
+  if (!results.length) return null
+  const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g, '')
+  const t = norm(title)
+  return (
+    results.find(r => norm(r.title) === t) ||
+    results.find(r => norm(r.title).includes(t) || t.includes(norm(r.title))) ||
+    results[0]
+  )
+}
+
+export async function animePaheEpisodes(animeId) {
+  const { data } = await ax.get(buildUrl(`/anime/animepahe/info/${encodeURIComponent(animeId)}`))
+  return data.episodes || []
+}
+
+export async function animePaheWatch(episodeId) {
+  const { data } = await ax.get(buildUrl(`/anime/animepahe/watch/${encodeURIComponent(episodeId)}`))
+  return {
+    sources: data.sources || [],
+    referer: data.headers?.Referer || 'https://kwik.cx/',
+  }
+}
+
+export async function getAnimePaheSources(title, ep) {
+  const results = await animePaheSearch(title)
+  const match   = animePaheMatch(results, title)
+  if (!match) return []
+
+  const episodes = await animePaheEpisodes(match.id)
+  const episode  = episodes.find(e => e.number === ep || e.number === String(ep))
+  if (!episode) return []
+
+  const { sources, referer } = await animePaheWatch(episode.id)
+
+  return sources
+    .filter(s => s.url)
+    .map(s => ({
+      label: `AnimePahe${s.quality ? ' · ' + s.quality : ''}`,
+      url  : proxyStream(s.url, referer),
+      group: 'AnimePahe',
+      type : 'hls',
+    }))
+}
+
 // ── Zoro / Aniwatch ───────────────────────────────────────────────
 export async function zoroSearch(title) {
   const { data } = await ax.get(buildUrl(`/anime/zoro/${encodeURIComponent(title)}`))
