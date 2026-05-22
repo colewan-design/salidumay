@@ -15,13 +15,14 @@ $parsed = parse_url($url);
 $host   = $parsed['host'] ?? '';
 
 $allowed = [
+    // AnimEx / Anikoto
     'cinewave2.site', 'miruro', 'watching.onl', 'lostproject.club', 'anikoto',
     // Gogoanime CDNs
-    'gogocdn.net', 'gogoplay', 'gogoanime', 'gogo-cdn', 'anihdplay',
-    // Zoro / Aniwatch CDNs
-    'megacloud.tv', 'rapid-cloud.co', 'rabbitstream.net',
-    // General anime CDNs
-    'cdn.plyr.io', 'cache.libass.net',
+    'gogocdn', 'gogoplay', 'gogoanime', 'gogo-cdn', 'anihdplay', 'fcdn', 'cdn32',
+    // Zoro / Aniwatch / Megacloud CDNs
+    'megacloud', 'rapid-cloud', 'rabbitstream', 'aniwatch', 'hls-stream',
+    // Bunny / Cloudfront / general anime CDNs
+    'akamaized', 'cloudfront', 'bunnycdn', 'b-cdn', 'storage.googleapis',
 ];
 $ok = false;
 foreach ($allowed as $d) {
@@ -56,7 +57,6 @@ curl_setopt_array($ch, [
 $body        = curl_exec($ch);
 $status      = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE) ?: '';
-curl_close($ch);
 
 http_response_code($status);
 
