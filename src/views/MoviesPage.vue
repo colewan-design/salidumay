@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import AppNavbar from '../components/AppNavbar.vue'
 import AppFooter from '../components/AppFooter.vue'
 import { getMovies } from '../services/api.js'
+import { addToLibrary, removeFromLibrary, getLibrary } from '../services/userdata.js'
 
 const router      = useRouter()
 const items       = ref([])
@@ -11,6 +11,20 @@ const loading     = ref(true)
 const loadingMore = ref(false)
 const page        = ref(1)
 const hasNext     = ref(false)
+const libraryIds  = ref(new Set(getLibrary().map(a => String(a.id))))
+
+async function toggleLibrary(e, anime) {
+  e.stopPropagation()
+  const id = String(anime.id)
+  if (libraryIds.value.has(id)) {
+    await removeFromLibrary(anime.id)
+    libraryIds.value.delete(id)
+  } else {
+    await addToLibrary(anime)
+    libraryIds.value.add(id)
+  }
+  libraryIds.value = new Set(libraryIds.value)
+}
 
 async function load(p = 1) {
   if (p === 1) loading.value = true
@@ -35,7 +49,6 @@ onMounted(() => load(1))
 
 <template>
   <div class="page">
-    <AppNavbar />
 
     <section class="banner">
       <div class="banner-bg"></div>
@@ -67,6 +80,16 @@ onMounted(() => load(1))
               <div class="play-btn">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
               </div>
+              <button
+                :class="['add-btn', { saved: libraryIds.has(String(anime.id)) }]"
+                :title="libraryIds.has(String(anime.id)) ? 'Remove from library' : 'Add to library'"
+                @click="toggleLibrary($event, anime)"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16">
+                  <path v-if="!libraryIds.has(String(anime.id))" d="M12 5v14M5 12h14" stroke-linecap="round"/>
+                  <path v-else d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
             </div>
           </div>
           <div class="card-body">
@@ -112,7 +135,7 @@ onMounted(() => load(1))
   background: radial-gradient(ellipse at 40% 60%, rgba(255,215,0,0.1) 0%, transparent 55%),
               radial-gradient(ellipse at 70% 30%, rgba(255,45,120,0.1) 0%, transparent 55%), var(--bg);
 }
-.banner-content { position: relative; z-index: 2; text-align: center; padding: 5rem 2rem 2rem; }
+.banner-content { position: relative; z-index: 2; text-align: center; padding: 2rem 2rem 2rem; }
 .tag  { font-size: .7rem; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: #ffd700; }
 .title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem,8vw,5rem); line-height: 1; color: #fff; margin: .3rem 0 .5rem; }
 .accent { color: #ffd700; }
@@ -133,9 +156,13 @@ onMounted(() => load(1))
 .movie-badge { position: absolute; top: 8px; left: 8px; background: rgba(255,215,0,.2); color: #ffd700; border: 1px solid rgba(255,215,0,.4); font-size: .6rem; font-weight: 800; padding: .2rem .45rem; border-radius: 4px; z-index: 2; }
 .rank-badge  { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,.6); color: rgba(255,255,255,.8); font-size: .62rem; font-weight: 800; padding: .2rem .45rem; border-radius: 4px; z-index: 2; }
 
-.play-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .25s; background: linear-gradient(to top, rgba(10,14,26,.8) 0%, transparent 70%); z-index: 3; }
+.play-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: .6rem; opacity: 0; transition: opacity .25s; background: linear-gradient(to top, rgba(10,14,26,.8) 0%, transparent 70%); z-index: 3; }
 .play-btn { width: 44px; height: 44px; border-radius: 50%; background: #ffd700; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(255,215,0,.5); }
 .play-btn svg { width: 18px; height: 18px; color: #000; }
+.add-btn { width: 34px; height: 34px; border-radius: 50%; background: rgba(0,240,255,.15); border: 1px solid rgba(0,240,255,.35); color: var(--cyan); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .2s; }
+.add-btn:hover { background: rgba(0,240,255,.3); }
+.add-btn.saved { background: rgba(110,255,110,.15); border-color: rgba(110,255,110,.4); color: #6eff6e; }
+.add-btn.saved:hover { background: rgba(110,255,110,.28); }
 
 .card-body { padding: .7rem; }
 .genre { font-size: .66rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #ffd700; }

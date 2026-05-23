@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import AppNavbar from '../components/AppNavbar.vue'
 import AppFooter from '../components/AppFooter.vue'
 import { getTrending } from '../services/api.js'
 
@@ -22,7 +21,6 @@ function watch(anime) {
 
 <template>
   <div class="page">
-    <AppNavbar />
 
     <section class="banner">
       <div class="banner-bg"></div>
@@ -80,7 +78,7 @@ function watch(anime) {
   background: radial-gradient(ellipse at 30% 60%, rgba(0,240,255,0.15) 0%, transparent 55%),
               radial-gradient(ellipse at 70% 40%, rgba(255,45,120,0.1) 0%, transparent 55%), var(--bg);
 }
-.banner-content { position: relative; z-index: 2; text-align: center; padding: 5rem 2rem 2rem; }
+.banner-content { position: relative; z-index: 2; text-align: center; padding: 2rem 2rem 2rem; }
 .tag { font-size: .7rem; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; }
 .cyan { color: var(--cyan); }
 .title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem,8vw,5rem); line-height: 1; margin: .3rem 0 .5rem; }

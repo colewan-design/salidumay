@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import AppNavbar from '../components/AppNavbar.vue'
 import AppFooter from '../components/AppFooter.vue'
 import { getRankings } from '../services/api.js'
 
@@ -38,7 +37,6 @@ onMounted(() => load(1))
 
 <template>
   <div class="page">
-    <AppNavbar />
 
     <section class="banner">
       <div class="banner-bg"></div>
@@ -117,7 +115,7 @@ onMounted(() => load(1))
   background: radial-gradient(ellipse at 50% 60%, rgba(255,215,0,0.08) 0%, transparent 60%),
               radial-gradient(ellipse at 30% 40%, rgba(0,240,255,0.1) 0%, transparent 55%), var(--bg);
 }
-.banner-content { position: relative; z-index: 2; text-align: center; padding: 5rem 2rem 2rem; }
+.banner-content { position: relative; z-index: 2; text-align: center; padding: 2rem 2rem 2rem; }
 .tag { font-size: .7rem; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: #ffd700; }
 .title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem,8vw,5rem); line-height: 1; color: #fff; margin: .3rem 0 .5rem; }
 .accent { color: var(--cyan); }

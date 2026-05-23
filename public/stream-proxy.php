@@ -21,8 +21,8 @@ $allowed = [
     'gogocdn', 'gogoplay', 'gogoanime', 'gogo-cdn', 'anihdplay', 'fcdn', 'cdn32',
     // Zoro / Aniwatch / Megacloud CDNs
     'megacloud', 'rapid-cloud', 'rabbitstream', 'aniwatch', 'hls-stream',
-    // AnimePahe / Kwik CDN
-    'kwik', 'animepahe', 'fanscottage', 'uwu',
+    // AnimePahe / Kwik CDN (delivery nodes and CF workers)
+    'kwik', 'animepahe', 'fanscottage', 'uwu', 'loot-link', 'workers.dev',
     // Bunny / Cloudfront / general anime CDNs
     'akamaized', 'cloudfront', 'bunnycdn', 'b-cdn', 'storage.googleapis',
 ];

@@ -52,7 +52,7 @@ function viewDetails() { if (active.value) router.push({ name: 'watch', params: 
         :key="item.id"
         class="hero-bg"
         :class="{ active: i === current }"
-        :style="`background-image: url('${item.image}')`"
+        :style="`background-image: url('${item.backdrop || item.image}')`"
       ></div>
       <!-- Overlays -->
       <div class="overlay-left"></div>

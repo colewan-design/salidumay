@@ -2,13 +2,15 @@
 import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Hls from 'hls.js'
-import AppNavbar from '../components/AppNavbar.vue'
 import CommentSection from '../components/CommentSection.vue'
 import { getAnimeDetail, getEpisodes, getRelated, getStreamingLinks } from '../services/api.js'
 import { getAllSources } from '../services/streamSources.js'
+import { useAuth } from '../store/auth.js'
+import { isInLibrary, addToLibrary, removeFromLibrary, recordHistory } from '../services/userdata.js'
 
 const route  = useRoute()
 const router = useRouter()
+const { isLoggedIn } = useAuth()
 
 const animeId   = computed(() => route.params.id)
 const currentEp = ref(Number(route.params.ep) || 1)
@@ -21,6 +23,7 @@ const streamingLinks = ref([])
 const loading        = ref(true)
 const activeTab      = ref('episodes')
 const audioMode      = ref('sub') // 'sub' | 'dub'
+const inLibrary      = ref(false)
 
 /* ── Streaming state ── */
 const streamLoading  = ref(false)
@@ -28,9 +31,34 @@ const streamError    = ref('')
 const allSources     = ref([])
 const activeSrc      = ref('')
 const activeGroup    = ref('')
-const activeSource   = ref(null)   // full source object
-const videoRef       = ref(null)   // <video> element for HLS
+const activeSource   = ref(null)
+const videoRef       = ref(null)
+const iframeRef      = ref(null)
+
 let   hlsInstance    = null
+let   sourceIndex    = 0
+let   iframeTimer    = null
+
+/* ── Skip times (AniSkip) ── */
+const skipTimes     = ref(null)
+const showSkipIntro = ref(false)
+const showSkipOutro = ref(false)
+
+/* ── Pause ad ── */
+const showPauseAd   = ref(false)
+const pauseAdDismissed = ref(false)
+
+function onVideoPause() {
+  if (!pauseAdDismissed.value) showPauseAd.value = true
+}
+function onVideoPlay() {
+  showPauseAd.value = false
+  pauseAdDismissed.value = false
+}
+function dismissPauseAd() {
+  showPauseAd.value = false
+  pauseAdDismissed.value = true
+}
 
 /* ── Computed ── */
 const currentEpisode = computed(() => episodes.value.find(e => e.number === currentEp.value) || null)
@@ -59,36 +87,122 @@ function mountHls(url) {
     hlsInstance.loadSource(url)
     hlsInstance.attachMedia(el)
     hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => el.play().catch(() => {}))
+    hlsInstance.on(Hls.Events.ERROR, onHlsError)
   } else if (el.canPlayType('application/vnd.apple.mpegurl')) {
     el.src = url
     el.play().catch(() => {})
   }
 }
 
+function clearIframeTimer() {
+  if (iframeTimer) { clearTimeout(iframeTimer); iframeTimer = null }
+}
+
 function selectSource(src) {
   destroyHls()
+  clearIframeTimer()
   activeSource.value = src
   activeSrc.value    = src.url
   activeGroup.value  = src.group
-  if (src.type === 'hls') nextTick(() => mountHls(src.url))
+  sourceIndex        = allSources.value.indexOf(src)
+  if (src.type === 'hls') {
+    nextTick(() => mountHls(src.url))
+  } else {
+    iframeTimer = setTimeout(() => {
+      console.warn('[stream] iframe timeout, trying next source')
+      tryNextSource()
+    }, 12000)
+  }
+}
+
+function tryNextSource() {
+  const next = allSources.value[sourceIndex + 1]
+  if (next) selectSource(next)
+}
+
+function onHlsError(_e, data) {
+  if (data.fatal) tryNextSource()
+}
+
+function onVideoError() {
+  tryNextSource()
+}
+
+function onIframeLoad() {
+  clearIframeTimer()
+}
+
+async function fetchSkipTimes(malId, ep) {
+  skipTimes.value     = null
+  showSkipIntro.value = false
+  showSkipOutro.value = false
+  try {
+    const res = await fetch(`https://api.aniskip.com/v1/skip-times/${malId}/${ep}?types[]=op&types[]=ed`)
+    if (!res.ok) return
+    const { results } = await res.json()
+    const times = {}
+    for (const r of results ?? []) {
+      if (r.skip_type === 'op') { times.introStart = r.interval.start_time; times.introEnd = r.interval.end_time }
+      if (r.skip_type === 'ed') { times.outroStart = r.interval.start_time; times.outroEnd = r.interval.end_time }
+    }
+    if (times.introStart !== undefined || times.outroStart !== undefined) skipTimes.value = times
+  } catch {}
+}
+
+function onTimeUpdate() {
+  const t = videoRef.value?.currentTime ?? 0
+  const s = skipTimes.value
+  if (!s) { showSkipIntro.value = false; showSkipOutro.value = false; return }
+  showSkipIntro.value = s.introStart !== undefined && t >= s.introStart && t < s.introEnd
+  showSkipOutro.value = s.outroStart !== undefined && t >= s.outroStart && t < s.outroEnd
+}
+
+function skipIntro() {
+  if (videoRef.value && skipTimes.value?.introEnd != null) videoRef.value.currentTime = skipTimes.value.introEnd
+}
+
+function skipOutro() {
+  if (videoRef.value && skipTimes.value?.outroEnd != null) videoRef.value.currentTime = skipTimes.value.outroEnd
+}
+
+function onIframeError() {
+  tryNextSource()
 }
 
 async function loadEpisodeStream(epNum) {
   destroyHls()
+  clearIframeTimer()
   activeSrc.value     = ''
   activeSource.value  = null
   allSources.value    = []
   streamError.value   = ''
   streamLoading.value = true
+  sourceIndex         = 0
 
   try {
-    const sources = await getAllSources(anime.value.title, epNum)
+    const title        = anime.value.title
+    const englishTitle = anime.value.englishTitle || anime.value.subtitle || ''
+    const cat          = audioMode.value
+    let sources = await getAllSources(title, epNum, cat, englishTitle)
     allSources.value = sources
     if (sources.length) selectSource(sources[0])
+    fetchSkipTimes(animeId.value, epNum)
+    if (isLoggedIn.value && anime.value) recordHistory(anime.value, epNum)
   } catch (e) {
     streamError.value = e.message
   }
   streamLoading.value = false
+}
+
+async function toggleLibrary() {
+  if (!anime.value) return
+  if (inLibrary.value) {
+    await removeFromLibrary(anime.value.id)
+    inLibrary.value = false
+  } else {
+    await addToLibrary(anime.value)
+    inLibrary.value = true
+  }
 }
 
 /* ── Episode navigation ── */
@@ -119,6 +233,7 @@ async function fetchData() {
   loading.value = false
 
   if (anime.value?.title) {
+    inLibrary.value = isInLibrary(anime.value.id)
     await loadEpisodeStream(currentEp.value)
   }
 }
@@ -126,12 +241,11 @@ async function fetchData() {
 watch(() => route.params.id, () => { currentEp.value = 1; fetchData() })
 
 onMounted(fetchData)
-onUnmounted(destroyHls)
+onUnmounted(() => { destroyHls(); clearIframeTimer() })
 </script>
 
 <template>
   <div class="page">
-    <AppNavbar />
 
     <div class="breadcrumb">
       <router-link to="/" class="bc-link">Home</router-link>
@@ -160,6 +274,10 @@ onUnmounted(destroyHls)
             <button :class="['audio-btn', { active: audioMode === 'sub' }]" @click="audioMode = 'sub'; loadEpisodeStream(currentEp)">SUB</button>
             <button :class="['audio-btn', { active: audioMode === 'dub' }]" @click="audioMode = 'dub'; loadEpisodeStream(currentEp)">DUB</button>
           </div>
+          <button v-if="isLoggedIn && anime" :class="['library-btn', { saved: inLibrary }]" @click="toggleLibrary" :title="inLibrary ? 'Remove from Library' : 'Add to Library'">
+            <svg viewBox="0 0 24 24" :fill="inLibrary ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            {{ inLibrary ? 'Saved' : 'Save' }}
+          </button>
           <button class="ep-nav-btn" :disabled="!hasNext" @click="nextEpisode">
             Next
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2-8.14 5.03 3.6L8 17.14V9.86zM16 6h2v12h-2z"/></svg>
@@ -176,16 +294,39 @@ onUnmounted(destroyHls)
             controls
             playsinline
             style="background:#000"
+            @timeupdate="onTimeUpdate"
+            @error="onVideoError"
+            @pause="onVideoPause"
+            @play="onVideoPlay"
           ></video>
+
+          <button v-if="isHlsSrc && showSkipIntro" class="skip-intro" @click="skipIntro">Skip Intro ›</button>
+          <button v-if="isHlsSrc && showSkipOutro" class="skip-intro" @click="skipOutro">Skip Outro ›</button>
+
+          <!-- Pause ad overlay -->
+          <div v-if="isHlsSrc && showPauseAd" class="pause-ad-overlay">
+            <button class="pause-ad-close" @click.stop="dismissPauseAd" title="Close">✕</button>
+            <div class="pause-ad-inner">
+              <span class="pause-ad-label">Advertisement</span>
+              <!-- Replace the block below with your actual ad tag / banner -->
+              <div class="pause-ad-banner">
+                <span class="pause-ad-placeholder">Ad Banner (728×90)</span>
+              </div>
+            </div>
+          </div>
 
           <!-- Iframe embed player -->
           <iframe
             v-else-if="!isHlsSrc && hasStream"
+            ref="iframeRef"
             class="video-el"
             :src="activeSrc"
             allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            allowfullscreen
             frameborder="0"
             scrolling="no"
+            @load="onIframeLoad"
+            @error="onIframeError"
           ></iframe>
 
           <!-- Loading -->
@@ -201,16 +342,24 @@ onUnmounted(destroyHls)
           </div>
         </div>
 
+        <!-- Fallback button (shown when iframe is active and next source exists) -->
+        <div v-if="!isHlsSrc && hasStream && allSources[sourceIndex + 1]" class="fallback-bar">
+          <span class="fallback-label">Video not loading?</span>
+          <button class="fallback-btn" @click="tryNextSource">
+            Try Source {{ sourceIndex + 2 }} →
+          </button>
+        </div>
+
         <!-- Source picker -->
         <div v-if="allSources.length" class="server-bar">
           <span class="server-label">Source</span>
           <button
-            v-for="src in allSources"
+            v-for="(src, i) in allSources"
             :key="src.url"
             :class="['server-btn', { active: activeSrc === src.url }]"
             @click="selectSource(src)"
           >
-            {{ src.label }}
+            Source {{ i + 1 }}
           </button>
         </div>
 
@@ -220,6 +369,7 @@ onUnmounted(destroyHls)
             <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
           Stream unavailable for this episode. Try another episode or check back later.
+          <span v-if="streamError" class="error-detail">{{ streamError }}</span>
         </div>
 
         <!-- Licensed streaming links -->
@@ -333,7 +483,7 @@ onUnmounted(destroyHls)
 <style scoped>
 .page { min-height: 100vh; background: var(--bg); }
 
-.breadcrumb { display:flex; align-items:center; gap:.4rem; padding:4.5rem 2rem .75rem; max-width:1400px; margin:0 auto; font-size:.78rem; color:var(--text-muted); }
+.breadcrumb { display:flex; align-items:center; gap:.4rem; padding:1.5rem 2rem .75rem; max-width:1400px; margin:0 auto; font-size:.78rem; color:var(--text-muted); }
 .bc-link { color:var(--text-muted); text-decoration:none; transition:color .2s; }
 .bc-link:hover { color:var(--cyan); }
 .bc-sep { color:var(--border); }
@@ -355,6 +505,11 @@ onUnmounted(destroyHls)
 .audio-toggle { display:flex; border:1px solid var(--border); border-radius:6px; overflow:hidden; flex-shrink:0; }
 .audio-btn { padding:.3rem .65rem; background:none; border:none; color:var(--text-muted); font-size:.72rem; font-weight:800; letter-spacing:.06em; cursor:pointer; transition:all .2s; }
 .audio-btn.active { background:var(--pink); color:#fff; }
+
+.library-btn { display:flex; align-items:center; gap:.3rem; padding:.3rem .7rem; background:none; border:1px solid var(--border); border-radius:6px; color:var(--text-muted); font-size:.72rem; font-weight:800; letter-spacing:.06em; cursor:pointer; transition:all .2s; flex-shrink:0; }
+.library-btn svg { width:.9rem; height:.9rem; }
+.library-btn:hover { border-color:var(--cyan-dim); color:var(--cyan); }
+.library-btn.saved { border-color:var(--cyan); color:var(--cyan); background:rgba(0,240,255,.08); }
 
 /* Player */
 .player-wrap { position:relative; width:100%; aspect-ratio:16/9; background:#000; border-radius:10px; overflow:hidden; border:1px solid var(--border); box-shadow:0 0 40px rgba(0,0,0,.6),0 0 0 1px rgba(0,240,255,.06); }
@@ -409,6 +564,21 @@ onUnmounted(destroyHls)
 .menu-item { display:block; width:100%; text-align:center; padding:.4rem .75rem; font-size:.8rem; font-weight:600; color:var(--text-muted); background:none; border:none; cursor:pointer; transition:all .15s; }
 .menu-item:hover { color:var(--cyan); background:rgba(0,240,255,.07); }
 .menu-item.active { color:var(--pink); font-weight:800; }
+
+/* Pause ad overlay */
+.pause-ad-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:9; pointer-events:none; }
+.pause-ad-inner { position:relative; display:flex; flex-direction:column; align-items:center; gap:.4rem; pointer-events:all; }
+.pause-ad-label { font-size:.6rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.45); }
+.pause-ad-banner { background:rgba(10,14,26,.9); border:1px solid rgba(0,240,255,.18); border-radius:6px; padding:1.25rem 2rem; display:flex; align-items:center; justify-content:center; min-width:320px; backdrop-filter:blur(10px); box-shadow:0 4px 32px rgba(0,0,0,.6); }
+.pause-ad-placeholder { font-size:.85rem; color:var(--text-muted); font-style:italic; }
+.pause-ad-close { position:absolute; top:-.6rem; right:-.6rem; width:1.4rem; height:1.4rem; border-radius:50%; background:rgba(10,14,26,.95); border:1px solid var(--border); color:var(--text-muted); font-size:.65rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .15s; z-index:1; }
+.pause-ad-close:hover { color:#fff; border-color:var(--pink); }
+
+/* Fallback bar */
+.fallback-bar { display:flex; align-items:center; gap:.6rem; padding:.45rem 0; margin-top:.35rem; }
+.fallback-label { font-size:.72rem; color:var(--text-muted); }
+.fallback-btn { padding:.28rem .75rem; background:rgba(255,45,120,.1); border:1px solid var(--pink); border-radius:5px; color:var(--pink); font-size:.72rem; font-weight:700; cursor:pointer; transition:all .18s; }
+.fallback-btn:hover { background:rgba(255,45,120,.2); }
 
 /* Server picker */
 .server-bar { display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; padding:.55rem 0; margin-top:.4rem; border-bottom:1px solid var(--border); }
@@ -533,7 +703,7 @@ kbd { background:var(--surface); border:1px solid var(--border); border-radius:3
   .series-progress,.details-table { grid-column:1/-1; }
 }
 @media (max-width:640px) {
-  .breadcrumb { padding:4rem 1rem .5rem; font-size:.72rem; }
+  .breadcrumb { padding:1rem 1rem .5rem; font-size:.72rem; }
   .player-sidebar { grid-template-columns:1fr; }
   .ep-nav-title { display:none; }
   .shortcuts-bar { display:none; }

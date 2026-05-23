@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>*{margin:0;padding:0}html,body,iframe{width:100%;height:100%;border:none;background:#000;display:block}</style>
+</head>
+<body>
+<script>
+  const allowed = [
+    'vidsrc.to','vidsrc.me','2embed.cc','www.2embed.cc',
+    'embed.su','autoembed.cc','multiembed.mov','player.videasy.net'
+  ]
+  const src = new URLSearchParams(location.search).get('src') || ''
+  let host = ''
+  try { host = new URL(src).hostname } catch {}
+  if (src && allowed.includes(host)) {
+    const f = document.createElement('iframe')
+    f.src = src
+    f.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture'
+    f.allowFullscreen = true
+    document.body.appendChild(f)
+  }
+</script>
+</body>
+</html>

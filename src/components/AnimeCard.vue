@@ -1,5 +1,7 @@
 <script setup>
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { addToLibrary, removeFromLibrary, isInLibrary } from '../services/userdata.js'
 
 const router = useRouter()
 const props = defineProps({
@@ -7,8 +9,27 @@ const props = defineProps({
   variant: { type: String,  default: 'default' },
 })
 
+const inLibrary = ref(false)
+const saving    = ref(false)
+
+onMounted(() => { inLibrary.value = isInLibrary(props.anime.id) })
+
 function watchAnime() {
   router.push({ name: 'watch', params: { id: props.anime.id, ep: 1 } })
+}
+
+async function toggleLibrary(e) {
+  e.stopPropagation()
+  if (saving.value) return
+  saving.value = true
+  if (inLibrary.value) {
+    await removeFromLibrary(props.anime.id)
+    inLibrary.value = false
+  } else {
+    await addToLibrary(props.anime)
+    inLibrary.value = true
+  }
+  saving.value = false
 }
 </script>
 
@@ -28,7 +49,17 @@ function watchAnime() {
         <button class="play-btn" aria-label="Watch" @click.stop="watchAnime">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
         </button>
-        <button class="add-btn" aria-label="Add to list">+</button>
+        <button
+          :class="['add-btn', { saved: inLibrary }]"
+          :aria-label="inLibrary ? 'Remove from library' : 'Add to library'"
+          :title="inLibrary ? 'Remove from library' : 'Add to library'"
+          @click.stop="toggleLibrary"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16">
+            <path v-if="!inLibrary" d="M12 5v14M5 12h14" stroke-linecap="round"/>
+            <path v-else d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
       </div>
     </div>
 
@@ -139,11 +170,17 @@ function watchAnime() {
   background: rgba(0,240,255,0.15);
   border: 1px solid var(--cyan-dim);
   color: var(--cyan);
-  font-size: 1.2rem;
   cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
   transition: all 0.2s;
 }
 .add-btn:hover { background: rgba(0,240,255,0.3); }
+.add-btn.saved {
+  background: rgba(110,255,110,0.15);
+  border-color: rgba(110,255,110,0.4);
+  color: #6eff6e;
+}
+.add-btn.saved:hover { background: rgba(110,255,110,0.28); }
 
 .card-body { padding: 0.75rem; }
 .card-genre {

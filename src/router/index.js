@@ -10,6 +10,11 @@ import MoviesPage   from '../views/MoviesPage.vue'
 import LoginPage    from '../views/LoginPage.vue'
 import RegisterPage from '../views/RegisterPage.vue'
 import AuthCallback from '../views/AuthCallback.vue'
+import LibraryPage  from '../views/LibraryPage.vue'
+import HistoryPage  from '../views/HistoryPage.vue'
+import FilmsPage         from '../views/FilmsPage.vue'
+import FilmPlayer        from '../views/FilmPlayer.vue'
+import FilmCategoryPage  from '../views/FilmCategoryPage.vue'
 
 const routes = [
   { path: '/',                        component: Home },
@@ -24,6 +29,11 @@ const routes = [
   { path: '/login',                   component: LoginPage },
   { path: '/register',                component: RegisterPage },
   { path: '/auth/callback',           component: AuthCallback },
+  { path: '/library',                 component: LibraryPage },
+  { path: '/history',                 component: HistoryPage },
+  { path: '/films',                            component: FilmsPage },
+  { path: '/films/:category', name: 'film-category', component: FilmCategoryPage },
+  { path: '/film/:id',        name: 'film',           component: FilmPlayer },
 ]
 
 export default createRouter({

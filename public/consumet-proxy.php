@@ -15,27 +15,40 @@ $params = $_GET;
 unset($params['path']);
 $qs = http_build_query($params);
 
-$base = 'https://consumet-api.vercel.app';
-$url  = $base . $path . ($qs ? '?' . $qs : '');
+// Try multiple public Consumet instances in order
+$bases = [
+    'https://consumet-api.vercel.app',
+    'https://consumet.pages.dev',
+];
 
-$ch = curl_init($url);
-curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_FOLLOWLOCATION => true,
-    CURLOPT_TIMEOUT        => 20,
-    CURLOPT_SSL_VERIFYPEER => false,
-    CURLOPT_HTTPHEADER     => [
-        'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept: application/json',
-    ],
-]);
+$body   = false;
+$status = 0;
+$err    = '';
 
-$body   = curl_exec($ch);
-$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-$err    = curl_error($ch);
-curl_close($ch);
+foreach ($bases as $base) {
+    $url = $base . $path . ($qs ? '?' . $qs : '');
+    $ch  = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_TIMEOUT        => 30,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_HTTPHEADER     => [
+            'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Accept: application/json',
+        ],
+    ]);
 
-if ($err) {
+    $body   = curl_exec($ch);
+    $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $err    = curl_error($ch);
+    curl_close($ch);
+
+    // Stop on a successful response
+    if (!$err && $status >= 200 && $status < 500) break;
+}
+
+if ($err && !$body) {
     http_response_code(502);
     echo json_encode(['error' => $err]);
     exit;

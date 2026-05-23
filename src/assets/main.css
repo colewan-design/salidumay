@@ -6,15 +6,18 @@
 
 /* ── Custom Properties ── */
 :root {
-  --bg:        #0a0e1a;
-  --bg-2:      #0d1527;
-  --surface:   #111827;
+  --bg:        #080b16;
+  --bg-2:      #0e1120;
+  --surface:   #131929;
   --border:    rgba(255,255,255,0.07);
   --cyan:      #00F0FF;
   --cyan-dim:  rgba(0,240,255,0.25);
   --pink:      #FF2D78;
-  --text:      #e8eaf2;
-  --text-muted: #6b7a99;
+  --purple:    #7c3aed;
+  --purple-dim: rgba(124,58,237,0.3);
+  --purple-soft: #a78bfa;
+  --text:      #e2e5f0;
+  --text-muted: #64748b;
   --font-head: 'Bebas Neue', 'Cinzel', sans-serif;
   --font-body: 'Nunito', system-ui, sans-serif;
 }

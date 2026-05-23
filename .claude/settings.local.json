@@ -8,6 +8,10 @@
       "Bash(ls -la \"C:\\\\salidumay-api\" 2>/dev/null | head -50)",
       "Read(//c/salidumay-api/**)",
       "WebFetch(domain:anime-api-sigma-livid.vercel.app)"
+    ],
+    "additionalDirectories": [
+      "C:\\salidumay-api\\app\\Models",
+      "C:\\salidumay-api\\app\\Http\\Controllers"
     ]
   }
 }

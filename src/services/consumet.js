@@ -32,6 +32,7 @@ function proxyStream(url, referer) {
 // ── Gogoanime ─────────────────────────────────────────────────────
 export async function gogoanimeSearch(title) {
   const { data } = await ax.get(buildUrl(`/anime/gogoanime/${encodeURIComponent(title)}`))
+  console.log('[consumet] gogoanime search results:', data.results?.length ?? 0, data.results?.[0]?.title)
   return data.results || []
 }
 
@@ -79,6 +80,7 @@ export async function getGogoanimeStreams(title, ep) {
 // ── AnimePahe (Kwik CDN) ──────────────────────────────────────────
 export async function animePaheSearch(title) {
   const { data } = await ax.get(buildUrl(`/anime/animepahe/${encodeURIComponent(title)}`))
+  console.log('[consumet] animepahe search results:', data.results?.length ?? 0, data.results?.[0]?.title)
   return data.results || []
 }
 
@@ -102,7 +104,7 @@ export async function animePaheWatch(episodeId) {
   const { data } = await ax.get(buildUrl(`/anime/animepahe/watch/${encodeURIComponent(episodeId)}`))
   return {
     sources: data.sources || [],
-    referer: data.headers?.Referer || 'https://kwik.cx/',
+    referer: data.headers?.Referer || 'https://animepahe.ru/',
   }
 }
 

@@ -7,13 +7,31 @@ const backend = axios.create({
 })
 
 
+function youtubeId(item) {
+  // Jikan nested object
+  if (item.trailer?.youtube_id) return item.trailer.youtube_id
+  if (item.trailer?.embed_url) {
+    const m = item.trailer.embed_url.match(/\/embed\/([^?/]+)/)
+    if (m?.[1]) return m[1]
+  }
+  // Flat trailerUrl from our DB (e.g. https://www.youtube.com/embed/abc123?...)
+  if (item.trailerUrl) {
+    const m = item.trailerUrl.match(/\/embed\/([^?/]+)/)
+    if (m?.[1]) return m[1]
+  }
+  return null
+}
+
 function normalizeAnime(item) {
   if (!item) return null
+  const ytId = youtubeId(item)
   return {
     id: item.id ?? item.mal_id,
     title: item.title || '',
     subtitle: item.subtitle || item.title_japanese || item.title_english || '',
+    englishTitle: item.englishTitle || item.title_english || '',
     image: item.image || item.images?.jpg?.large_image_url || item.images?.jpg?.image_url || '',
+    backdrop: ytId ? `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg` : '',
     genre: item.genre || item.genres?.[0]?.name || item.demographics?.[0]?.name || 'Anime',
     badge: item.badge || item.genres?.[0]?.name || 'Anime',
     rating: typeof item.rating === 'number' ? item.rating : (typeof item.score === 'number' ? item.score : 0),

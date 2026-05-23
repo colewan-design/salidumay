@@ -1,7 +1,6 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import AppNavbar from '../components/AppNavbar.vue'
 import AppFooter from '../components/AppFooter.vue'
 import { getAnimeList, getGenres, searchAnime } from '../services/api.js'
 
@@ -12,7 +11,10 @@ const baseAnime = ref([])
 const genres    = ref([])
 const loading   = ref(true)
 
-const searchQuery  = ref('')
+const searchQuery      = ref('')
+const suggestions      = ref([])
+const showSuggestions  = ref(false)
+const activeSuggestion = ref(-1)
 const activeGenre  = ref('All')
 const activeStatus = ref('All')
 const activeSort   = ref('rating')
@@ -49,18 +51,53 @@ let searchTimer = null
 
 watch(searchQuery, (q) => {
   clearTimeout(searchTimer)
+  activeSuggestion.value = -1
   const trimmed = q.trim()
   if (trimmed.length >= 2) {
     loading.value = true
     searchTimer = setTimeout(async () => {
       const res = await searchAnime(trimmed).catch(() => null)
-      if (res) allAnime.value = res.data
+      if (res) {
+        allAnime.value = res.data
+        suggestions.value = res.data.slice(0, 7)
+        showSuggestions.value = true
+      }
       loading.value = false
-    }, 500)
-  } else if (!trimmed) {
-    allAnime.value = baseAnime.value
+    }, 400)
+  } else {
+    suggestions.value = []
+    showSuggestions.value = false
+    if (!trimmed) allAnime.value = baseAnime.value
   }
 })
+
+function selectSuggestion(anime) {
+  showSuggestions.value = false
+  router.push({ name: 'watch', params: { id: anime.id, ep: 1 } })
+}
+
+function onSearchKeydown(e) {
+  if (e.key === 'Escape') {
+    searchQuery.value = ''
+    showSuggestions.value = false
+    return
+  }
+  if (!showSuggestions.value || !suggestions.value.length) return
+  if (e.key === 'ArrowDown') {
+    e.preventDefault()
+    activeSuggestion.value = Math.min(activeSuggestion.value + 1, suggestions.value.length - 1)
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault()
+    activeSuggestion.value = Math.max(activeSuggestion.value - 1, -1)
+  } else if (e.key === 'Enter' && activeSuggestion.value >= 0) {
+    e.preventDefault()
+    selectSuggestion(suggestions.value[activeSuggestion.value])
+  }
+}
+
+function onSearchBlur() {
+  setTimeout(() => { showSuggestions.value = false }, 160)
+}
 
 onUnmounted(() => clearTimeout(searchTimer))
 
@@ -76,7 +113,6 @@ onMounted(async () => {
 
 <template>
   <div class="page">
-    <AppNavbar />
 
     <!-- Banner -->
     <section class="watch-banner">
@@ -88,17 +124,40 @@ onMounted(async () => {
         <p class="banner-sub">Stream thousands of episodes in HD — dubbed &amp; subbed</p>
 
         <!-- Search -->
-        <div class="search-bar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-            <circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/>
-          </svg>
-          <input
-            v-model="searchQuery"
-            class="search-input"
-            placeholder="Search by title or genre…"
-            @keydown.esc="searchQuery = ''"
-          />
-          <button v-if="searchQuery" class="search-clear" @click="searchQuery = ''">✕</button>
+        <div class="search-container">
+          <div class="search-bar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input
+              v-model="searchQuery"
+              class="search-input"
+              placeholder="Search by title or genre…"
+              autocomplete="off"
+              @keydown="onSearchKeydown"
+              @blur="onSearchBlur"
+              @focus="showSuggestions = suggestions.length > 0"
+            />
+            <button v-if="searchQuery" class="search-clear" @click="searchQuery = ''; showSuggestions = false">✕</button>
+          </div>
+
+          <Transition name="suggestions">
+            <ul v-if="showSuggestions && suggestions.length" class="suggestions-dropdown">
+              <li
+                v-for="(anime, i) in suggestions"
+                :key="anime.id"
+                :class="['suggestion-item', { active: activeSuggestion === i }]"
+                @mousedown.prevent="selectSuggestion(anime)"
+              >
+                <img :src="anime.image" :alt="anime.title" class="sug-img" />
+                <div class="sug-info">
+                  <span class="sug-title">{{ anime.title }}</span>
+                  <span class="sug-meta">{{ anime.genre }} · ★ {{ typeof anime.rating === 'number' ? anime.rating.toFixed(1) : anime.rating }} · {{ anime.episodes }}ep</span>
+                </div>
+                <span :class="['sug-status', anime.status === 'Airing' ? 'airing' : 'done']">{{ anime.status === 'Airing' ? '● Airing' : '✓ Done' }}</span>
+              </li>
+            </ul>
+          </Transition>
         </div>
       </div>
     </section>
@@ -263,12 +322,11 @@ onMounted(async () => {
 }
 
 /* Search */
+.search-container { position: relative; max-width: 480px; margin: 0 auto; }
 .search-bar {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  max-width: 480px;
-  margin: 0 auto;
   background: rgba(255,255,255,0.05);
   border: 1px solid var(--cyan-dim);
   border-radius: 8px;
@@ -300,6 +358,44 @@ onMounted(async () => {
   transition: color 0.2s;
 }
 .search-clear:hover { color: var(--pink); }
+
+/* Autocomplete dropdown */
+.suggestions-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0; right: 0;
+  background: rgba(10,14,26,0.98);
+  border: 1px solid var(--cyan-dim);
+  border-radius: 10px;
+  list-style: none;
+  margin: 0; padding: 0.35rem 0;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,240,255,0.05);
+  backdrop-filter: blur(16px);
+  z-index: 300;
+  overflow: hidden;
+}
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.45rem 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.suggestion-item:hover,
+.suggestion-item.active { background: rgba(0,240,255,0.07); }
+.sug-img { width: 38px; height: 54px; object-fit: cover; border-radius: 4px; flex-shrink: 0; background: #0d1527; }
+.sug-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.2rem; }
+.sug-title { font-size: 0.85rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sug-meta { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sug-status { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0; }
+.sug-status.airing { color: var(--cyan); }
+.sug-status.done { color: #6eff6e; }
+
+.suggestions-enter-active { transition: opacity 0.15s, transform 0.15s; }
+.suggestions-leave-active { transition: opacity 0.1s; }
+.suggestions-enter-from { opacity: 0; transform: translateY(-4px); }
+.suggestions-leave-to { opacity: 0; }
 
 /* ── Filters ── */
 .filters-bar {

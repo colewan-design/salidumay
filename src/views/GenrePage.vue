@@ -1,7 +1,6 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import AppNavbar from '../components/AppNavbar.vue'
 import AppFooter from '../components/AppFooter.vue'
 import { getByGenre, getGenres } from '../services/api.js'
 
@@ -62,7 +61,6 @@ onMounted(async () => {
 
 <template>
   <div class="page">
-    <AppNavbar />
 
     <section class="banner">
       <div class="banner-bg"></div>
@@ -149,7 +147,7 @@ onMounted(async () => {
   background: radial-gradient(ellipse at 60% 60%, rgba(255,45,120,0.12) 0%, transparent 55%),
               radial-gradient(ellipse at 30% 40%, rgba(0,240,255,0.1) 0%, transparent 55%), var(--bg);
 }
-.banner-content { position: relative; z-index: 2; text-align: center; padding: 5rem 2rem 1.5rem; }
+.banner-content { position: relative; z-index: 2; text-align: center; padding: 2rem 2rem 1.5rem; }
 .tag { font-size: .7rem; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: var(--pink); }
 .title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem,6vw,4rem); line-height: 1; color: #fff; margin: .3rem 0 .4rem; }
 .accent { color: var(--pink); }

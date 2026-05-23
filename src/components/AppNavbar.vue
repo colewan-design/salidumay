@@ -1,412 +1,455 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { useAuth } from '../store/auth.js'
+import { searchAnime } from '../services/api.js'
+import { searchFilms } from '../services/tmdb.js'
 
 const route  = useRoute()
 const router = useRouter()
 const { user, isLoggedIn, logout } = useAuth()
 
-const scrolled = ref(false)
-const menuOpen = ref(false)
-const searchOpen = ref(false)
-const searchQuery = ref('')
-const userMenuOpen = ref(false)
+const collapsed    = ref(false)
+const mobileOpen   = ref(false)
+const searchQuery  = ref('')
+const suggestions  = ref([])
+const showSug      = ref(false)
+const activeSug    = ref(-1)
+let   searchTimer  = null
 
 async function handleLogout() {
-  userMenuOpen.value = false
   await logout()
   router.push('/')
 }
 
-function onScroll() {
-  scrolled.value = window.scrollY > 40
+watch(searchQuery, (q) => {
+  clearTimeout(searchTimer)
+  activeSug.value = -1
+  const t = q.trim()
+  if (t.length >= 2) {
+    searchTimer = setTimeout(async () => {
+      const [animeRes, filmRes] = await Promise.allSettled([
+        searchAnime(t),
+        searchFilms(t, 1),
+      ])
+      const anime = animeRes.status === 'fulfilled'
+        ? (animeRes.value.data || []).slice(0, 4).map(a => ({ ...a, _type: 'anime' }))
+        : []
+      const films = filmRes.status === 'fulfilled'
+        ? (filmRes.value.data || []).slice(0, 3).map(f => ({ ...f, _type: 'film' }))
+        : []
+      suggestions.value = [...anime, ...films]
+      showSug.value = suggestions.value.length > 0
+    }, 350)
+  } else {
+    suggestions.value = []; showSug.value = false
+  }
+})
+
+function selectSug(item) {
+  searchQuery.value = ''; showSug.value = false; mobileOpen.value = false
+  if (item._type === 'film') {
+    router.push({ name: 'film', params: { id: item.id } })
+  } else {
+    router.push({ name: 'watch', params: { id: item.id, ep: 1 } })
+  }
 }
 
-function onDocClick(e) {
-  if (!e.target.closest('.user-menu-wrap')) userMenuOpen.value = false
+function onKeydown(e) {
+  if (e.key === 'Escape') { showSug.value = false; return }
+  if (e.key === 'Enter') {
+    if (activeSug.value >= 0) { e.preventDefault(); selectSug(suggestions.value[activeSug.value]) }
+    else submitSearch()
+    return
+  }
+  if (!showSug.value || !suggestions.value.length) return
+  if (e.key === 'ArrowDown') { e.preventDefault(); activeSug.value = Math.min(activeSug.value + 1, suggestions.value.length - 1) }
+  if (e.key === 'ArrowUp')   { e.preventDefault(); activeSug.value = Math.max(activeSug.value - 1, -1) }
 }
-
-onMounted(() => {
-  window.addEventListener('scroll', onScroll)
-  document.addEventListener('click', onDocClick)
-})
-onUnmounted(() => {
-  window.removeEventListener('scroll', onScroll)
-  document.removeEventListener('click', onDocClick)
-})
-
-const navLinks = [
-  { label: 'Home',      to: '/' },
-  { label: 'Trending',  to: '/trending' },
-  { label: 'Seasonal',  to: '/seasonal' },
-  { label: 'Movies',    to: '/movies' },
-  { label: 'Rankings',  to: '/rankings' },
-  { label: 'Genres',    to: '/genre' },
-]
-
-const isOnWatch = () => route.path.startsWith('/watch')
 
 function submitSearch() {
   const q = searchQuery.value.trim()
-  if (q) {
-    router.push({ path: '/watch', query: { q } })
-    searchOpen.value = false
-    searchQuery.value = ''
-  }
+  if (q) { router.push({ path: '/watch', query: { q } }); searchQuery.value = ''; showSug.value = false }
+}
+
+const navItems = [
+  { label: 'Home',         to: '/',          icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
+  { label: 'Trending',     to: '/trending',  icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
+  { label: 'Seasonal',     to: '/seasonal',  icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
+  { label: 'Rankings',     to: '/rankings',  icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+  { label: 'Genres',       to: '/genre',     icon: 'M4 6h16M4 10h16M4 14h16M4 18h16' },
+]
+
+const contentItems = [
+  { label: 'Anime Movies', to: '/movies',             icon: 'M7 4v16M17 4v16M3 8h4m10 0h4M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z' },
+  { label: 'All Films',    to: '/films',              icon: 'M15 10l4.553-2.069A1 1 0 0121 8.868V15.13a1 1 0 01-1.447.899L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z' },
+  { label: 'Coming Soon',  to: '/films/coming-soon',  icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
+  { label: 'Action',       to: '/films/action',       icon: 'M13 10V3L4 14h7v7l9-11h-7z' },
+  { label: 'Watch',        to: '/watch',              icon: 'M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+]
+
+const accountItems = [
+  { label: 'Library',  to: '/library',  icon: 'M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z' },
+  { label: 'History',  to: '/history',  icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
+]
+
+function isActive(to) {
+  if (to === '/') return route.path === '/'
+  return route.path.startsWith(to)
 }
 </script>
 
 <template>
-  <nav :class="['navbar', { scrolled }]">
-    <div class="nav-inner">
-      <!-- Logo -->
-      <RouterLink to="/" class="logo">
-        <span class="logo-kanji">サ</span>
-      </RouterLink>
+  <!-- Mobile toggle -->
+  <button class="mob-toggle" @click="mobileOpen = !mobileOpen" aria-label="Menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <path v-if="!mobileOpen" d="M4 6h16M4 12h16M4 18h16"/>
+      <path v-else d="M6 18L18 6M6 6l12 12"/>
+    </svg>
+  </button>
 
-      <!-- Desktop links -->
-      <ul class="nav-links">
-        <li v-for="link in navLinks" :key="link.label">
-          <RouterLink :to="link.to" class="nav-link">{{ link.label }}</RouterLink>
-        </li>
-        <li>
-          <RouterLink to="/watch" :class="['nav-link', 'nav-link-watch', { active: isOnWatch() }]">Watch</RouterLink>
-        </li>
-      </ul>
+  <!-- Overlay -->
+  <div v-if="mobileOpen" class="mob-overlay" @click="mobileOpen = false"></div>
 
-      <!-- Right controls -->
-      <div class="nav-right">
-        <div :class="['search-wrap', { open: searchOpen }]">
-          <input
-            v-if="searchOpen"
-            v-model="searchQuery"
-            class="search-input"
-            placeholder="Search anime…"
-            autofocus
-            @keydown.esc="searchOpen = false"
-            @keydown.enter="submitSearch"
-          />
-          <button class="icon-btn" @click="searchOpen = !searchOpen" aria-label="Search">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-              <circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/>
-            </svg>
-          </button>
-        </div>
-        <!-- Auth -->
-        <template v-if="isLoggedIn">
-          <div class="user-menu-wrap">
-            <button class="user-avatar-btn" @click="userMenuOpen = !userMenuOpen" aria-label="User menu">
-              <img v-if="user?.avatar" :src="user.avatar" class="user-avatar" alt="avatar" />
-              <span v-else class="user-avatar-initials">{{ user?.name?.[0]?.toUpperCase() || 'U' }}</span>
-            </button>
-            <Transition name="fade">
-              <div v-if="userMenuOpen" class="user-dropdown">
-                <div class="user-dropdown-name">{{ user?.name }}</div>
-                <div class="user-dropdown-email">{{ user?.email }}</div>
-                <hr class="dropdown-divider" />
-                <button class="dropdown-item" @click="handleLogout">Sign Out</button>
-              </div>
-            </Transition>
-          </div>
-        </template>
-        <template v-else>
-          <RouterLink to="/login" class="btn-signin">Sign In</RouterLink>
-        </template>
+  <!-- Sidebar -->
+  <aside :class="['sidebar', { collapsed, 'mob-open': mobileOpen }]">
 
-        <button class="icon-btn hamburger" @click="menuOpen = !menuOpen" aria-label="Menu">
-          <span :class="{ open: menuOpen }"></span>
-        </button>
-      </div>
+    <!-- Logo -->
+    <RouterLink to="/" class="logo" @click="mobileOpen = false">
+      <span class="logo-kanji">サ</span>
+      <span class="logo-text">Salidumay</span>
+    </RouterLink>
+
+    <!-- Search -->
+    <div class="search-wrap" @click.stop>
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input
+        v-model="searchQuery"
+        class="search-input"
+        placeholder="Search anime…"
+        autocomplete="off"
+        @keydown="onKeydown"
+        @blur="showSug = false"
+        @focus="showSug = suggestions.length > 0"
+      />
+      <Transition name="fade">
+        <ul v-if="showSug && suggestions.length" class="suggestions">
+          <li
+            v-for="(item, i) in suggestions" :key="item._type + item.id"
+            :class="['sug-item', { active: activeSug === i }]"
+            @mousedown.prevent="selectSug(item)"
+          >
+            <img :src="item.image" class="sug-img" :alt="item.title" />
+            <div class="sug-info">
+              <span class="sug-title">{{ item.title }}</span>
+              <span class="sug-meta">
+                <span :class="['sug-badge', item._type]">{{ item._type === 'film' ? 'FILM' : 'ANIME' }}</span>
+                {{ item.genre || item.genreNames?.[0] || '' }}
+                · ★ {{ typeof item.rating === 'number' ? item.rating.toFixed(1) : item.rating }}
+              </span>
+            </div>
+          </li>
+        </ul>
+      </Transition>
     </div>
 
-    <!-- Mobile menu -->
-    <Transition name="slide-down">
-      <div v-if="menuOpen" class="mobile-menu">
+    <nav class="nav">
+      <!-- Discover -->
+      <p class="nav-label">Discover</p>
+      <RouterLink
+        v-for="item in navItems" :key="item.to"
+        :to="item.to"
+        :class="['nav-item', { active: isActive(item.to) }]"
+        @click="mobileOpen = false"
+      >
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path :d="item.icon" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="nav-label-text">{{ item.label }}</span>
+      </RouterLink>
+
+      <!-- Content -->
+      <p class="nav-label">Content</p>
+      <RouterLink
+        v-for="item in contentItems" :key="item.to"
+        :to="item.to"
+        :class="['nav-item', { active: isActive(item.to) }]"
+        @click="mobileOpen = false"
+      >
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path :d="item.icon" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="nav-label-text">{{ item.label }}</span>
+      </RouterLink>
+
+      <!-- Account -->
+      <template v-if="isLoggedIn">
+        <p class="nav-label">Account</p>
         <RouterLink
-          v-for="link in navLinks"
-          :key="link.label"
-          :to="link.to"
-          class="mobile-link"
-          @click="menuOpen = false"
-        >{{ link.label }}</RouterLink>
-        <RouterLink to="/watch" :class="['mobile-link', 'mobile-link-watch', { active: isOnWatch() }]" @click="menuOpen = false">Watch</RouterLink>
-        <template v-if="isLoggedIn">
-          <button class="mobile-link mobile-signout" @click="handleLogout; menuOpen = false">Sign Out</button>
-        </template>
-        <template v-else>
-          <RouterLink to="/login" class="mobile-link" @click="menuOpen = false">Sign In</RouterLink>
-          <RouterLink to="/register" class="mobile-link" @click="menuOpen = false">Register</RouterLink>
-        </template>
-      </div>
-    </Transition>
-  </nav>
+          v-for="item in accountItems" :key="item.to"
+          :to="item.to"
+          :class="['nav-item', { active: isActive(item.to) }]"
+          @click="mobileOpen = false"
+        >
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path :d="item.icon" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="nav-label-text">{{ item.label }}</span>
+        </RouterLink>
+      </template>
+    </nav>
+
+    <!-- Bottom: user / sign in -->
+    <div class="sidebar-bottom">
+      <template v-if="isLoggedIn">
+        <div class="user-row">
+          <div class="user-avatar">
+            <img v-if="user?.avatar" :src="user.avatar" :alt="user.name" />
+            <span v-else>{{ user?.name?.[0]?.toUpperCase() || 'U' }}</span>
+          </div>
+          <div class="user-info">
+            <span class="user-name">{{ user?.name }}</span>
+            <span class="user-email">{{ user?.email }}</span>
+          </div>
+        </div>
+        <button class="signout-btn" @click="handleLogout">Sign Out</button>
+      </template>
+      <template v-else>
+        <RouterLink to="/login"    class="auth-btn primary" @click="mobileOpen = false">Sign In</RouterLink>
+        <RouterLink to="/register" class="auth-btn"         @click="mobileOpen = false">Register</RouterLink>
+      </template>
+    </div>
+  </aside>
 </template>
 
 <style scoped>
-.navbar {
+/* ── Mobile toggle ── */
+.mob-toggle {
+  display: none;
   position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  transition: background 0.3s, box-shadow 0.3s;
+  top: 1rem; left: 1rem;
+  z-index: 300;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .5rem;
+  color: var(--text);
+  cursor: pointer;
 }
-.navbar.scrolled {
-  background: rgba(10, 14, 26, 0.88);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 2px 32px rgba(0,240,255,0.06);
+.mob-toggle svg { width: 1.2rem; height: 1.2rem; display: block; }
+
+.mob-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  z-index: 150;
+  backdrop-filter: blur(2px);
 }
-.nav-inner {
+
+/* ── Sidebar ── */
+.sidebar {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: 220px;
+  background: #0d0b1a;
+  border-right: 1px solid rgba(124,58,237,0.18);
   display: flex;
-  align-items: center;
-  gap: 2rem;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 1rem 2rem;
+  flex-direction: column;
+  z-index: 200;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
 }
+.sidebar::-webkit-scrollbar { display: none; }
+
+/* ── Logo ── */
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: .65rem;
+  padding: 1.5rem 1.25rem 1rem;
   text-decoration: none;
   flex-shrink: 0;
 }
 .logo-kanji {
-  font-size: 2.2rem;
-  color: var(--cyan);
-  filter: drop-shadow(0 0 12px var(--cyan)) drop-shadow(0 0 24px rgba(0,240,255,0.4));
+  font-size: 1.8rem;
+  color: var(--purple);
+  filter: drop-shadow(0 0 10px rgba(124,58,237,.5));
   line-height: 1;
+  flex-shrink: 0;
 }
 .logo-text {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.5rem;
-  letter-spacing: 0.12em;
+  font-size: 1.15rem;
+  letter-spacing: .1em;
   color: var(--text);
 }
-.logo-accent { color: var(--pink); }
 
-.nav-links {
-  display: flex;
-  list-style: none;
-  gap: 0.25rem;
-  margin: 0;
-  padding: 0;
-  flex: 1;
-}
-.nav-link {
+/* ── Search ── */
+.search-wrap {
   position: relative;
-  padding: 0.4rem 0.75rem;
-  font-size: 0.88rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  text-decoration: none;
-  transition: color 0.2s;
+  margin: 0 .85rem .85rem;
+  flex-shrink: 0;
 }
-.nav-link::after {
-  content: '';
+.search-icon {
   position: absolute;
-  bottom: -2px; left: 0.75rem; right: 0.75rem;
-  height: 2px;
-  background: linear-gradient(90deg, var(--cyan), var(--pink));
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.25s;
-  border-radius: 2px;
-}
-.nav-link:hover { color: var(--cyan); }
-.nav-link:hover::after { transform: scaleX(1); }
-.nav-link-watch { color: var(--pink); }
-.nav-link-watch::after { background: var(--pink); }
-.nav-link-watch:hover { color: var(--pink); filter: brightness(1.2); }
-.nav-link-watch.active { color: var(--pink); filter: brightness(1.2); }
-.nav-link-watch.active::after { transform: scaleX(1); }
-
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-left: auto;
-}
-.search-wrap { display: flex; align-items: center; gap: 0.4rem; }
-.search-input {
-  background: rgba(0,240,255,0.07);
-  border: 1px solid var(--cyan-dim);
-  border-radius: 6px;
-  padding: 0.35rem 0.75rem;
-  color: var(--text);
-  font-size: 0.875rem;
-  width: 180px;
-  outline: none;
-  transition: border 0.2s;
-}
-.search-input:focus { border-color: var(--cyan); }
-
-.icon-btn {
-  background: none;
-  border: none;
+  left: .65rem; top: 50%;
+  transform: translateY(-50%);
+  width: .9rem; height: .9rem;
   color: var(--text-muted);
+  pointer-events: none;
+}
+.search-input {
+  width: 100%;
+  background: rgba(124,58,237,.08);
+  border: 1px solid rgba(124,58,237,.18);
+  border-radius: 8px;
+  padding: .45rem .65rem .45rem 2rem;
+  color: var(--text);
+  font-size: .8rem;
+  outline: none;
+  transition: border-color .2s;
+}
+.search-input::placeholder { color: var(--text-muted); }
+.search-input:focus { border-color: rgba(124,58,237,.5); }
+
+.suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0; right: 0;
+  background: rgba(13,11,26,.98);
+  border: 1px solid rgba(124,58,237,.25);
+  border-radius: 10px;
+  list-style: none;
+  padding: .3rem 0;
+  box-shadow: 0 8px 32px rgba(0,0,0,.6);
+  z-index: 400;
+  overflow: hidden;
+}
+.sug-item {
+  display: flex; align-items: center; gap: .55rem;
+  padding: .4rem .75rem;
   cursor: pointer;
-  padding: 0.4rem;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  transition: color 0.2s;
+  transition: background .15s;
 }
-.icon-btn svg { width: 1.15rem; height: 1.15rem; }
-.icon-btn:hover { color: var(--cyan); }
+.sug-item:hover, .sug-item.active { background: rgba(124,58,237,.15); }
+.sug-img { width: 28px; height: 40px; object-fit: cover; border-radius: 3px; flex-shrink: 0; }
+.sug-info { flex: 1; min-width: 0; }
+.sug-title { display: block; font-size: .78rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sug-meta  { display: flex; align-items: center; gap: .35rem; font-size: .65rem; color: var(--text-muted); margin-top: .1rem; }
+.sug-badge { font-size: .55rem; font-weight: 800; letter-spacing: .08em; padding: .1rem .3rem; border-radius: 3px; flex-shrink: 0; }
+.sug-badge.anime { background: rgba(124,58,237,.25); color: #a78bfa; }
+.sug-badge.film  { background: rgba(255,45,120,.2);  color: var(--pink); }
 
-
-/* Hamburger */
-.hamburger { display: none; flex-direction: column; gap: 4px; padding: 0.5rem; }
-.hamburger span,
-.hamburger span::before,
-.hamburger span::after {
-  display: block; width: 20px; height: 2px;
-  background: var(--text-muted);
-  transition: all 0.25s;
-}
-.hamburger span { position: relative; }
-.hamburger span::before,
-.hamburger span::after { content: ''; position: absolute; }
-.hamburger span::before { top: -6px; }
-.hamburger span::after  { top: 6px; }
-.hamburger span.open { background: transparent; }
-.hamburger span.open::before { transform: rotate(45deg) translate(4px, 4px); }
-.hamburger span.open::after  { transform: rotate(-45deg) translate(4px, -4px); }
-
-/* Mobile menu */
-.mobile-menu {
+/* ── Nav ── */
+.nav {
+  flex: 1;
+  padding: 0 .6rem;
   display: flex;
   flex-direction: column;
-  padding: 1rem 2rem;
-  background: rgba(10, 14, 26, 0.97);
-  border-top: 1px solid var(--border);
+  gap: .1rem;
 }
-.mobile-link {
-  padding: 0.8rem 0;
-  color: var(--text-muted);
-  text-decoration: none;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  border-bottom: 1px solid var(--border);
-  transition: color 0.2s;
+.nav-label {
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.25);
+  padding: .85rem .65rem .3rem;
+  pointer-events: none;
 }
-.mobile-link:hover { color: var(--cyan); }
-.mobile-link-watch { color: var(--pink); }
-.mobile-link-watch:hover, .mobile-link-watch.active { color: var(--pink); filter: brightness(1.2); }
-
-
-/* Slide-down transition */
-.slide-down-enter-active,
-.slide-down-leave-active { transition: all 0.25s ease; }
-.slide-down-enter-from,
-.slide-down-leave-to { opacity: 0; transform: translateY(-8px); }
-
-/* Auth */
-.btn-signin {
-  padding: 0.35rem 0.9rem;
-  border: 1px solid rgba(0,240,255,0.4);
-  border-radius: 6px;
-  color: #00f0ff;
-  font-size: 0.82rem;
-  font-weight: 600;
-  text-decoration: none;
-  letter-spacing: 0.05em;
-  transition: background 0.2s, color 0.2s;
-}
-.btn-signin:hover {
-  background: rgba(0,240,255,0.1);
-}
-
-.user-menu-wrap { position: relative; }
-.user-avatar-btn {
-  background: none;
-  border: 2px solid rgba(0,240,255,0.35);
-  border-radius: 50%;
-  width: 34px;
-  height: 34px;
-  cursor: pointer;
-  padding: 0;
-  overflow: hidden;
+.nav-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: border-color 0.2s;
-}
-.user-avatar-btn:hover { border-color: #00f0ff; }
-.user-avatar { width: 100%; height: 100%; object-fit: cover; }
-.user-avatar-initials {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #00f0ff;
-}
-.user-dropdown {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
-  background: rgba(10,14,26,0.97);
-  border: 1px solid rgba(0,240,255,0.15);
-  border-radius: 10px;
-  min-width: 190px;
-  padding: 0.75rem 0;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-  z-index: 200;
-}
-.user-dropdown-name {
-  padding: 0 1rem 0.1rem;
-  font-size: 0.9rem;
+  gap: .65rem;
+  padding: .5rem .65rem;
+  border-radius: 8px;
+  color: rgba(255,255,255,.5);
+  text-decoration: none;
+  font-size: .84rem;
   font-weight: 600;
-  color: #fff;
-}
-.user-dropdown-email {
-  padding: 0 1rem 0.5rem;
-  font-size: 0.78rem;
-  color: rgba(255,255,255,0.4);
+  transition: background .18s, color .18s;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
-.dropdown-divider {
-  border: none;
-  border-top: 1px solid rgba(255,255,255,0.08);
-  margin: 0 0 0.35rem;
-}
-.dropdown-item {
-  display: block;
-  width: 100%;
-  padding: 0.5rem 1rem;
-  background: none;
-  border: none;
-  color: rgba(255,255,255,0.7);
-  font-size: 0.88rem;
-  text-align: left;
-  cursor: pointer;
-  transition: color 0.2s, background 0.2s;
-}
-.dropdown-item:hover { color: #ff6b6b; background: rgba(255,60,60,0.07); }
+.nav-item:hover { background: rgba(255,255,255,.06); color: rgba(255,255,255,.85); }
+.nav-item.active { background: rgba(124,58,237,.2); color: #a78bfa; }
+.nav-item.active .nav-icon { color: #a78bfa; }
+.nav-icon { width: 1.05rem; height: 1.05rem; flex-shrink: 0; color: rgba(255,255,255,.35); transition: color .18s; }
+.nav-item:hover .nav-icon { color: rgba(255,255,255,.7); }
+.nav-label-text { flex: 1; }
 
-.mobile-signout {
+/* ── Bottom ── */
+.sidebar-bottom {
+  padding: 1rem .85rem;
+  border-top: 1px solid rgba(124,58,237,.18);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+.user-row { display: flex; align-items: center; gap: .6rem; }
+.user-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(124,58,237,.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .8rem; font-weight: 700; color: #a78bfa;
+  background: rgba(124,58,237,.15);
+  flex-shrink: 0;
+}
+.user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.user-info { flex: 1; min-width: 0; }
+.user-name  { display: block; font-size: .78rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-email { display: block; font-size: .65rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.signout-btn {
+  width: 100%;
+  padding: .4rem;
   background: none;
-  border: none;
-  text-align: left;
-  color: #ff6b6b;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: .75rem;
   font-weight: 600;
   cursor: pointer;
-  padding: 0.8rem 0;
-  font-size: inherit;
-  letter-spacing: 0.05em;
-  border-bottom: 1px solid var(--border);
-  width: 100%;
+  transition: all .2s;
+  text-align: center;
 }
+.signout-btn:hover { border-color: #ef4444; color: #ef4444; }
+.auth-btn {
+  display: block;
+  text-align: center;
+  padding: .45rem;
+  border-radius: 6px;
+  font-size: .78rem;
+  font-weight: 700;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,.1);
+  color: var(--text-muted);
+  transition: all .2s;
+}
+.auth-btn:hover { border-color: rgba(255,255,255,.2); color: var(--text); }
+.auth-btn.primary { background: var(--purple); border-color: var(--purple); color: #fff; }
+.auth-btn.primary:hover { background: #6d28d9; }
 
-.fade-enter-active, .fade-leave-active { transition: opacity 0.15s, transform 0.15s; }
-.fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(-6px); }
+/* ── Transitions ── */
+.fade-enter-active, .fade-leave-active { transition: opacity .15s, transform .15s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(-4px); }
 
+/* ── Mobile ── */
 @media (max-width: 768px) {
-  .nav-links { display: none; }
-  .hamburger { display: flex; }
-  .user-menu-wrap { display: none; }
-  .btn-signin { display: none; }
+  .mob-toggle  { display: flex; }
+  .mob-overlay { display: block; }
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform .28s cubic-bezier(.4,0,.2,1);
+  }
+  .sidebar.mob-open {
+    transform: translateX(0);
+    box-shadow: 8px 0 40px rgba(0,0,0,.6);
+  }
 }
 </style>
