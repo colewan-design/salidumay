@@ -60,12 +60,16 @@ function normalizeDirect(m) {
 
 async function withFallback(backendCall, directCall) {
   try {
-    const res = await backendCall()
-    // If backend has no data yet (empty), try direct
-    if (res.data?.data?.length === 0 && TMDB_KEY) {
+    const res  = await backendCall()
+    const body = res.data
+    if (body?.data?.length === 0 && TMDB_KEY) {
       return await directCall()
     }
-    return res.data
+    return {
+      data:       body.data,
+      totalPages: body.pagination?.total_pages ?? body.totalPages ?? 1,
+      pagination: body.pagination,
+    }
   } catch {
     if (TMDB_KEY) return await directCall()
     throw new Error('Backend unavailable and no VITE_TMDB_KEY set')

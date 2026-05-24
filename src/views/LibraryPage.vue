@@ -10,13 +10,18 @@ const { isLoggedIn } = useAuth()
 const library = ref([])
 const loading = ref(true)
 
+function migrateEntry(item) {
+  if (item.type) return item
+  // episodes is null/undefined → saved from TMDB film carousel; anime always has a number or '?'
+  const isFilm = item.episodes == null || item.episodes === 0
+  return { ...item, type: isFilm ? 'film' : 'anime' }
+}
+
 async function load() {
   loading.value = true
-  if (isLoggedIn.value) {
-    library.value = await syncLibraryFromServer()
-  } else {
-    library.value = getLibrary()
-  }
+  let entries = isLoggedIn.value ? await syncLibraryFromServer() : getLibrary()
+  // backfill type for entries saved before the type field was introduced
+  library.value = entries.map(migrateEntry)
   loading.value = false
 }
 

@@ -44,22 +44,6 @@ const skipTimes     = ref(null)
 const showSkipIntro = ref(false)
 const showSkipOutro = ref(false)
 
-/* ── Pause ad ── */
-const showPauseAd   = ref(false)
-const pauseAdDismissed = ref(false)
-
-function onVideoPause() {
-  if (!pauseAdDismissed.value) showPauseAd.value = true
-}
-function onVideoPlay() {
-  showPauseAd.value = false
-  pauseAdDismissed.value = false
-}
-function dismissPauseAd() {
-  showPauseAd.value = false
-  pauseAdDismissed.value = true
-}
-
 /* ── Computed ── */
 const currentEpisode = computed(() => episodes.value.find(e => e.number === currentEp.value) || null)
 const hasNext    = computed(() => episodes.value.some(e => e.number === currentEp.value + 1))
@@ -296,24 +280,10 @@ onUnmounted(() => { destroyHls(); clearIframeTimer() })
             style="background:#000"
             @timeupdate="onTimeUpdate"
             @error="onVideoError"
-            @pause="onVideoPause"
-            @play="onVideoPlay"
           ></video>
 
           <button v-if="isHlsSrc && showSkipIntro" class="skip-intro" @click="skipIntro">Skip Intro ›</button>
           <button v-if="isHlsSrc && showSkipOutro" class="skip-intro" @click="skipOutro">Skip Outro ›</button>
-
-          <!-- Pause ad overlay -->
-          <div v-if="isHlsSrc && showPauseAd" class="pause-ad-overlay">
-            <button class="pause-ad-close" @click.stop="dismissPauseAd" title="Close">✕</button>
-            <div class="pause-ad-inner">
-              <span class="pause-ad-label">Advertisement</span>
-              <!-- Replace the block below with your actual ad tag / banner -->
-              <div class="pause-ad-banner">
-                <span class="pause-ad-placeholder">Ad Banner (728×90)</span>
-              </div>
-            </div>
-          </div>
 
           <!-- Iframe embed player -->
           <iframe
@@ -340,6 +310,18 @@ onUnmounted(() => { destroyHls(); clearIframeTimer() })
             <div class="no-video-icon">▶</div>
             <p>No stream available for this episode</p>
           </div>
+        </div>
+
+        <!-- Ad warning (iframe sources only) -->
+        <div v-if="!isHlsSrc && hasStream" class="ad-warning">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ad-warning-icon">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <span>
+            This stream provider may show ads or open new tabs.
+            Use <strong>uBlock Origin</strong> or <strong>Brave Browser</strong> for an ad-free experience.
+          </span>
         </div>
 
         <!-- Fallback button (shown when iframe is active and next source exists) -->
@@ -565,14 +547,22 @@ onUnmounted(() => { destroyHls(); clearIframeTimer() })
 .menu-item:hover { color:var(--cyan); background:rgba(0,240,255,.07); }
 .menu-item.active { color:var(--pink); font-weight:800; }
 
-/* Pause ad overlay */
-.pause-ad-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:9; pointer-events:none; }
-.pause-ad-inner { position:relative; display:flex; flex-direction:column; align-items:center; gap:.4rem; pointer-events:all; }
-.pause-ad-label { font-size:.6rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.45); }
-.pause-ad-banner { background:rgba(10,14,26,.9); border:1px solid rgba(0,240,255,.18); border-radius:6px; padding:1.25rem 2rem; display:flex; align-items:center; justify-content:center; min-width:320px; backdrop-filter:blur(10px); box-shadow:0 4px 32px rgba(0,0,0,.6); }
-.pause-ad-placeholder { font-size:.85rem; color:var(--text-muted); font-style:italic; }
-.pause-ad-close { position:absolute; top:-.6rem; right:-.6rem; width:1.4rem; height:1.4rem; border-radius:50%; background:rgba(10,14,26,.95); border:1px solid var(--border); color:var(--text-muted); font-size:.65rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .15s; z-index:1; }
-.pause-ad-close:hover { color:#fff; border-color:var(--pink); }
+/* Ad warning */
+.ad-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: .5rem;
+  padding: .45rem .75rem;
+  background: rgba(251,191,36,.07);
+  border: 1px solid rgba(251,191,36,.2);
+  border-radius: 6px;
+  margin-top: .35rem;
+  font-size: .75rem;
+  color: rgba(251,191,36,.85);
+  line-height: 1.4;
+}
+.ad-warning strong { color: #fbbf24; }
+.ad-warning-icon { width: .95rem; height: .95rem; flex-shrink: 0; margin-top: .1rem; stroke: #fbbf24; }
 
 /* Fallback bar */
 .fallback-bar { display:flex; align-items:center; gap:.6rem; padding:.45rem 0; margin-top:.35rem; }

@@ -1,3 +1,7 @@
+<script setup>
+import { RouterLink } from 'vue-router'
+</script>
+
 <template>
   <footer class="footer">
     <div class="footer-inner">
@@ -25,30 +29,30 @@
       <div class="footer-links-group">
         <h4>Browse</h4>
         <ul>
-          <li><a href="#trending">Trending</a></li>
-          <li><a href="#seasonal">Seasonal</a></li>
-          <li><a href="#top">Top Anime</a></li>
-          <li><a href="#genres">Genres</a></li>
+          <li><RouterLink to="/trending">Trending</RouterLink></li>
+          <li><RouterLink to="/seasonal">Seasonal</RouterLink></li>
+          <li><RouterLink to="/rankings">Top Anime</RouterLink></li>
+          <li><RouterLink to="/genre">Genres</RouterLink></li>
         </ul>
       </div>
 
       <div class="footer-links-group">
         <h4>Community</h4>
         <ul>
-          <li><a href="#">Forum</a></li>
-          <li><a href="#">Reviews</a></li>
-          <li><a href="#">Watch Lists</a></li>
-          <li><a href="#">Recommendations</a></li>
+          <li><RouterLink to="/forum">Forum</RouterLink></li>
+          <li><RouterLink to="/reviews">Reviews</RouterLink></li>
+          <li><RouterLink to="/watchlists">Watch Lists</RouterLink></li>
+          <li><RouterLink to="/recommendations">Recommendations</RouterLink></li>
         </ul>
       </div>
 
       <div class="footer-links-group">
         <h4>Company</h4>
         <ul>
-          <li><a href="#">About Us</a></li>
-          <li><a href="#">Press Kit</a></li>
-          <li><a href="#">Careers</a></li>
-          <li><a href="#">Contact</a></li>
+          <li><RouterLink to="/about">About Us</RouterLink></li>
+          <li><RouterLink to="/press">Press Kit</RouterLink></li>
+          <li><RouterLink to="/careers">Careers</RouterLink></li>
+          <li><RouterLink to="/contact">Contact</RouterLink></li>
         </ul>
       </div>
     </div>
@@ -56,9 +60,9 @@
     <div class="footer-bottom">
       <span>© 2025 Salidumay. Built for anime fans, by anime fans.</span>
       <div class="legal-links">
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
-        <a href="#">Cookies</a>
+        <RouterLink to="/privacy">Privacy</RouterLink>
+        <RouterLink to="/terms">Terms</RouterLink>
+        <RouterLink to="/cookies">Cookies</RouterLink>
       </div>
     </div>
   </footer>

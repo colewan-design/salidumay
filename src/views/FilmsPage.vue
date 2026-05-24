@@ -54,7 +54,7 @@ async function load(p = 1) {
     page.value       = p
   }
 
-  loading.value    = false
+  loading.value     = false
   loadingMore.value = false
 }
 
@@ -135,7 +135,7 @@ onMounted(async () => {
 
       <!-- Skeleton -->
       <div v-if="loading" class="grid">
-        <div v-for="n in 20" :key="n" class="skeleton-card">
+        <div v-for="n in 24" :key="n" class="skeleton-card">
           <div class="sk-img skeleton"></div>
           <div class="sk-line skeleton"></div>
           <div class="sk-line2 skeleton"></div>
